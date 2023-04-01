@@ -1,8 +1,5 @@
 import React from "react";
 import styles from "./HomePage.module.css";
-import cover from "../image/background_home_1.png";
-import ad1 from "../image/ad1.png";
-import ad3 from "../image/ad3.jpg";
 import TransBgBtn from "../components/UI/TransBgBtn";
 import LiteratureSection from "../components/body/home/LiteratureSection";
 import MediaSection from "../components/body/home/MediaSection";
@@ -23,7 +20,7 @@ const HomePage = () => {
         <div className={styles.text_area}>
           <p className={styles.title}>{homepageData.homepage_title}</p>
           <p className={styles.des}>{homepageData.homepage_description}</p>
-          <TransBgBtn />
+          <TransBgBtn>Read more →</TransBgBtn>
         </div>
       </div>
       <div className={styles.ad_section}>

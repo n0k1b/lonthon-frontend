@@ -10,6 +10,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { homepageActions } from "./redux/homepage-slice";
 import { Helmet } from "react-helmet";
 import ScrollToTop from "./ScrollToTop";
+import DashboardPage from "./pages/DashboardPage";
 
 function App() {
   const dispatch = useDispatch();
@@ -49,6 +50,8 @@ function App() {
                 <Route exact path="/" element={<HomePage />} />
 
                 <Route path="/literature" element={<LiteraturePage />} />
+
+                <Route exact path="/dashboard" element={<DashboardPage />} />
               </Routes>
             </ScrollToTop>
 
