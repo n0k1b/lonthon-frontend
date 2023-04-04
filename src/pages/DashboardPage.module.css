@@ -170,3 +170,7 @@
   margin: 10px 0;
   border-top: 0.6px solid #6f6d6d;
 }
+
+.link {
+  text-decoration: none;
+}

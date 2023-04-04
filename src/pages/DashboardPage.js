@@ -11,6 +11,7 @@ import {
   Tooltip,
   Legend,
 } from "recharts";
+import { Link } from "react-router-dom";
 
 const DUMMY_DATA = [
   { name: "Jan", value: 20 },
@@ -47,13 +48,23 @@ const DashboardPage = () => {
               <p className={styles.role}>Content Writter</p>
             </div>
           </div>
-          <div className={styles.btn}>Edit Profile</div>
+          <Link className={styles.link} to="/dashboard/edit_profile">
+            <div className={styles.btn}>Edit Profile</div>
+          </Link>
         </div>
 
         <div className={styles.optionsCon}>
-          <p className={styles.active}>Dashboard</p>
-          <p className={styles.options}>Contact</p>
-          <p className={styles.options}>Products</p>
+          <Link className={styles.link} to="/dashboard">
+            <p className={styles.active}>Dashboard</p>
+          </Link>
+
+          <Link className={styles.link} to="/dashboard/contact">
+            <p className={styles.options}>Contact</p>
+          </Link>
+
+          <Link className={styles.link} to="/dashboard/products">
+            <p className={styles.options}>Products</p>
+          </Link>
         </div>
       </div>
 

@@ -11,6 +11,7 @@ import { homepageActions } from "./redux/homepage-slice";
 import { Helmet } from "react-helmet";
 import ScrollToTop from "./ScrollToTop";
 import DashboardPage from "./pages/DashboardPage";
+import EditProfile from "./pages/EditProfile";
 
 function App() {
   const dispatch = useDispatch();
@@ -52,6 +53,11 @@ function App() {
                 <Route path="/literature" element={<LiteraturePage />} />
 
                 <Route exact path="/dashboard" element={<DashboardPage />} />
+
+                <Route
+                  path="/dashboard/edit_profile"
+                  element={<EditProfile />}
+                />
               </Routes>
             </ScrollToTop>
 
