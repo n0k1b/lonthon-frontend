@@ -12,6 +12,7 @@ import { Helmet } from "react-helmet";
 import ScrollToTop from "./ScrollToTop";
 import DashboardPage from "./pages/DashboardPage";
 import EditProfile from "./pages/EditProfile";
+import ProductsPage from "./pages/ProductsPage";
 
 function App() {
   const dispatch = useDispatch();
@@ -58,6 +59,8 @@ function App() {
                   path="/dashboard/edit_profile"
                   element={<EditProfile />}
                 />
+
+                <Route path="/dashboard/products" element={<ProductsPage />} />
               </Routes>
             </ScrollToTop>
 

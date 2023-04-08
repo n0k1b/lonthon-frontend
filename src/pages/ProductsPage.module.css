@@ -1,0 +1,65 @@
+.rightCon {
+  background-color: #eae9e9;
+  height: fit-content;
+  width: 78%;
+  display: flex;
+  justify-content: space-between;
+  padding: 34px 28px;
+}
+
+.rContainer {
+  width: 100%;
+}
+
+.pTitle {
+  font-size: 24px;
+  color: #6f6d6d;
+}
+
+.filterOp {
+  width: fit-content;
+  height: 54px;
+  background: #6f6d6d;
+  outline: none;
+  color: white;
+  padding: 14px 24px;
+  font-size: 16px;
+  margin-right: 14px;
+}
+
+.filterContainer {
+  margin-top: 39px;
+}
+
+.tableCon {
+  height: fit-content;
+  margin-top: 30px;
+}
+
+.tableSearch {
+  height: 40px;
+  width: 300px;
+  outline: none;
+  padding: 10px 20px;
+  margin-top: 10px;
+}
+
+.addBtn {
+  margin-top: 30px;
+  cursor: pointer;
+}
+
+.back {
+  color: #6f6d6d;
+  margin-bottom: 10px;
+  cursor: pointer;
+  border: 1px solid #6f6d6d;
+  width: fit-content;
+  padding: 5px 10px;
+  transition: 0.3s ease;
+}
+
+.back:hover {
+  background-color: #6f6d6d;
+  color: white;
+}
