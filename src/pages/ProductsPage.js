@@ -6,6 +6,9 @@ import { Link } from "react-router-dom";
 import DataTable from "react-data-table-component";
 import GreyBtn from "../components/UI/GreyBtn";
 import addBtn from "../image/addBtn.png";
+import addBtn2 from "../image/addBtn2.png";
+import { BsFiletypeDoc, BsImage, BsFiletypePdf } from "react-icons/bs";
+import { BiText } from "react-icons/bi";
 
 const products = [
   {
@@ -74,6 +77,11 @@ const ProductsPage = () => {
   const [search, setSearch] = useState("");
   const [data, setData] = useState(products);
   const [upload, setUpload] = useState(false);
+  const [image, setImage] = useState(null);
+  const [addImg, setAddImg] = useState(false);
+
+  const [num, setNum] = useState(1);
+  const [authorNum, setAuthorNum] = useState([1]);
 
   useEffect(() => {
     const result = products.filter((data) =>
@@ -81,6 +89,36 @@ const ProductsPage = () => {
     );
     setData(result);
   }, [search]);
+
+  useEffect(() => {
+    if (image) {
+      setAddImg(true);
+    }
+  }, [image]);
+
+  const handleImageChange = (event) => {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+    try {
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        if (!image) {
+          setImage([reader.result]);
+          console.log(image);
+        } else {
+          setImage([...image, reader.result]);
+          console.log(image);
+        }
+      };
+    } catch {
+      console.log("Not selected");
+    }
+  };
+
+  const authorHandler = () => {
+    setNum(num + 1);
+    setAuthorNum([...authorNum, num + 1]);
+  };
 
   const columns = [
     {
@@ -195,12 +233,134 @@ const ProductsPage = () => {
           </div>
         )}
 
-        <div className={classes.uploadSection}>
-          <p className={classes.back} onClick={() => setUpload(false)}>
-            Go back
-          </p>
-          <p className={classes.pTitle}>Producte Upload</p>
-        </div>
+        {upload && (
+          <div className={classes.uploadSection}>
+            <p className={classes.back} onClick={() => setUpload(false)}>
+              Go back
+            </p>
+            <p className={classes.pTitle}>Producte Upload</p>
+
+            <div className={classes.filterContainer}>
+              <select className={classes.filterOp} name="filter">
+                <option value="" disabled selected>
+                  Select Category
+                </option>
+                <option value="novels">Novels</option>
+                <option value="poems">Poems</option>
+                <option value="others">Others</option>
+              </select>
+
+              <select className={classes.filterOp} name="filter">
+                <option value="" disabled selected>
+                  Select Sub Category
+                </option>
+                <option value="novels">Novels</option>
+                <option value="poems">Poems</option>
+                <option value="others">Others</option>
+              </select>
+
+              <select className={classes.filterOp} name="filter">
+                <option value="" disabled selected>
+                  Genre
+                </option>
+                <option value="novels">Novels</option>
+                <option value="poems">Poems</option>
+                <option value="others">Others</option>
+              </select>
+            </div>
+
+            <div className={classes.addPForm}>
+              <div>
+                <p className={classes.formTitle}>Title</p>
+                <input className={classes.inputText} type="text" />
+              </div>
+
+              <div>
+                <p className={classes.formTitle}>Description</p>
+                <textarea className={classes.ayInput} />
+              </div>
+
+              <div className={classes.nameCon}>
+                {/* <div>
+                  <p className={classes.formTitle}>Content Name</p>
+                  <input className={classes.inputText} type="text" />
+                </div> */}
+
+                <div className={classes.lanSelectCon}>
+                  <p className={classes.formTitle}>Language</p>
+
+                  <select className={classes.filterOpUp} name="filter">
+                    <option value="" disabled selected>
+                      Select Language
+                    </option>
+                    <option value="novels">Novels</option>
+                    <option value="poems">Poems</option>
+                    <option value="others">Others</option>
+                  </select>
+                </div>
+              </div>
+
+              <div className={classes.authorNameSec}>
+                {authorNum.map((num) => (
+                  <div>
+                    <p className={classes.formTitle}>Author Name {num}</p>
+                    <input className={classes.inputText} type="text" />
+                  </div>
+                ))}
+
+                <img
+                  className={classes.addimgBtn}
+                  src={addBtn2}
+                  alt=""
+                  onClick={authorHandler}
+                />
+              </div>
+
+              <div className={classes.uploadContentCon}>
+                <p className={classes.ucTitle}>Upload your content</p>
+                <div>
+                  <BsFiletypePdf className={classes.docLogo} />
+                  <BsImage className={classes.docLogo} />
+                  <BsFiletypeDoc className={classes.docLogo} />
+                  <BiText className={classes.docLogo} />
+                </div>
+              </div>
+
+              <div
+                className={classes.uploadImg}
+                onClick={() => document.querySelector(".input_img").click()}
+              >
+                <p>Upload Thumbnail Image</p>
+              </div>
+              <input
+                type="file"
+                accept="image/*"
+                className="input_img"
+                hidden
+                onChange={handleImageChange}
+              />
+              {addImg && (
+                <img
+                  className={classes.addimgBtn}
+                  src={addBtn2}
+                  alt=""
+                  onClick={() => document.querySelector(".input_img").click()}
+                />
+              )}
+
+              <div
+                className={classes.uploadImg}
+                onClick={() => document.querySelector(".input_img").click()}
+              >
+                <p>Upload Banner Image</p>
+              </div>
+
+              <div className={classes.saveBtn}>
+                <GreyBtn>Save</GreyBtn>
+              </div>
+            </div>
+          </div>
+        )}
       </div>
     </div>
   );

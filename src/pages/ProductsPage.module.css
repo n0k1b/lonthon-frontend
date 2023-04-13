@@ -63,3 +63,97 @@
   background-color: #6f6d6d;
   color: white;
 }
+
+.uploadImg {
+  width: 316px;
+  height: 106px;
+  background: #d9d9d9;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 16px;
+  color: #6f6d6d;
+  margin-top: 43px;
+  cursor: pointer;
+}
+
+.addimgBtn {
+  margin: 20px 0px;
+  cursor: pointer;
+}
+
+.test {
+  width: 100px;
+}
+
+.formTitle {
+  font-size: 12px;
+  color: #6f6d6d;
+  margin-bottom: 9px;
+  margin-top: 16px;
+}
+
+.inputText {
+  width: 100%;
+  height: 36px;
+  border: 1px solid #6f6d6d;
+  border-radius: 2px;
+  outline: none;
+  padding: 12px 20px;
+  background-color: #eae9e9;
+}
+
+.filterOpUp {
+  width: fit-content;
+  height: 36px;
+  outline: none;
+  color: #6f6d6d;
+  background-color: #eae9e9;
+  padding: 8px 17px;
+  font-size: 12px;
+}
+
+.nameCon {
+  display: flex;
+}
+
+.docLogo {
+  color: #6d6d6d;
+  font-size: 30px;
+  margin-right: 10px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.uploadContentCon {
+  width: 560px;
+  height: 148px;
+  border: 1px solid #6f6d6d;
+  border-radius: 2px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+
+.ucTitle {
+  font-size: 12px;
+  color: #6f6d6d;
+}
+
+.saveBtn {
+  width: 112px;
+  margin-top: 20px;
+}
+
+.ayInput {
+  height: 148px;
+  width: 100%;
+  padding: 12px 20px;
+  box-sizing: border-box;
+  background-color: #eae9e9;
+  resize: none;
+  border: 1px solid #6f6d6d;
+  border-radius: 2px;
+  outline: none;
+}
