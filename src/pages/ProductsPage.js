@@ -80,8 +80,16 @@ const ProductsPage = () => {
   const [image, setImage] = useState(null);
   const [addImg, setAddImg] = useState(false);
 
+  const [pdfFile, setPdfFile] = useState(null);
+  const [thumbImg, setThumbImg] = useState([]);
+  const [banImg, setBanImg] = useState([]);
+
   const [num, setNum] = useState(1);
   const [authorNum, setAuthorNum] = useState([1]);
+
+  const [addPdf, setAddPdf] = useState(false);
+  const [addImage, setAddImage] = useState(false);
+  const [addText, setAddText] = useState(false);
 
   useEffect(() => {
     const result = products.filter((data) =>
@@ -115,9 +123,65 @@ const ProductsPage = () => {
     }
   };
 
+  const handleImageChangeThumb = (event) => {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+    try {
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        if (!image) {
+          setThumbImg([reader.result]);
+          console.log(image);
+        } else {
+          setThumbImg([...image, reader.result]);
+          console.log(image);
+        }
+      };
+    } catch {
+      console.log("Not selected");
+    }
+  };
+
+  const handleImageChangeBan = (event) => {
+    const file = event.target.files[0];
+    const reader = new FileReader();
+    try {
+      reader.readAsDataURL(file);
+      reader.onload = () => {
+        if (!image) {
+          setBanImg([reader.result]);
+          console.log(image);
+        } else {
+          setBanImg([...image, reader.result]);
+          console.log(image);
+        }
+      };
+    } catch {
+      console.log("Not selected");
+    }
+  };
+
   const authorHandler = () => {
     setNum(num + 1);
     setAuthorNum([...authorNum, num + 1]);
+  };
+
+  const pdfUploadSec = () => {
+    setAddPdf(true);
+    setAddImage(false);
+    setAddText(false);
+  };
+
+  const imageUploadSec = () => {
+    setAddPdf(false);
+    setAddImage(true);
+    setAddText(false);
+  };
+
+  const textUploadSec = () => {
+    setAddPdf(false);
+    setAddImage(false);
+    setAddText(true);
   };
 
   const columns = [
@@ -281,11 +345,6 @@ const ProductsPage = () => {
               </div>
 
               <div className={classes.nameCon}>
-                {/* <div>
-                  <p className={classes.formTitle}>Content Name</p>
-                  <input className={classes.inputText} type="text" />
-                </div> */}
-
                 <div className={classes.lanSelectCon}>
                   <p className={classes.formTitle}>Language</p>
 
@@ -319,40 +378,106 @@ const ProductsPage = () => {
               <div className={classes.uploadContentCon}>
                 <p className={classes.ucTitle}>Upload your content</p>
                 <div>
-                  <BsFiletypePdf className={classes.docLogo} />
-                  <BsImage className={classes.docLogo} />
-                  <BsFiletypeDoc className={classes.docLogo} />
-                  <BiText className={classes.docLogo} />
+                  <BsFiletypePdf
+                    className={classes.docLogo}
+                    onClick={pdfUploadSec}
+                  />
+                  <BsImage
+                    className={classes.docLogo}
+                    onClick={imageUploadSec}
+                  />
+                  <BiText className={classes.docLogo} onClick={textUploadSec} />
                 </div>
               </div>
 
-              <div
-                className={classes.uploadImg}
-                onClick={() => document.querySelector(".input_img").click()}
-              >
-                <p>Upload Thumbnail Image</p>
-              </div>
-              <input
-                type="file"
-                accept="image/*"
-                className="input_img"
-                hidden
-                onChange={handleImageChange}
-              />
-              {addImg && (
-                <img
-                  className={classes.addimgBtn}
-                  src={addBtn2}
-                  alt=""
-                  onClick={() => document.querySelector(".input_img").click()}
-                />
+              {addText && (
+                <div>
+                  <p className={classes.formTitle}>Content</p>
+                  <textarea className={classes.contentInput} />
+                </div>
               )}
 
-              <div
-                className={classes.uploadImg}
-                onClick={() => document.querySelector(".input_img").click()}
-              >
-                <p>Upload Banner Image</p>
+              {addImage && (
+                <div>
+                  <p className={classes.formTitle}>Content</p>
+                  <div
+                    className={classes.uploadImg}
+                    onClick={() => document.querySelector(".input_img").click()}
+                  >
+                    <p>Upload Image</p>
+                  </div>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    className="input_img"
+                    hidden
+                    onChange={handleImageChange}
+                  />
+                  {addImg && (
+                    <img
+                      className={classes.addimgBtn}
+                      src={addBtn2}
+                      alt=""
+                      onClick={() =>
+                        document.querySelector(".input_img").click()
+                      }
+                    />
+                  )}
+                </div>
+              )}
+
+              {addPdf && (
+                <div className={classes.addPDF}>
+                  <p className={classes.formTitle}>Content</p>
+                  <div
+                    className={classes.uploadImg}
+                    onClick={() => document.querySelector(".input_pdf").click()}
+                  >
+                    <p>Upload PDF</p>
+                  </div>
+                  <input
+                    className="input_pdf"
+                    type="file"
+                    accept="application/pdf"
+                    hidden
+                    onChange={(e) => setPdfFile(e.target.files[0])}
+                  />
+                </div>
+              )}
+
+              <div className={classes.TBSec}>
+                <p className={classes.formTitle}>Thumbnail and Banner</p>
+                <div
+                  className={classes.uploadImg}
+                  onClick={() =>
+                    document.querySelector(".input_thumbImg").click()
+                  }
+                >
+                  <p>Upload Thumbnail Image</p>
+                </div>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="input_thumbImg"
+                  hidden
+                  onChange={handleImageChangeThumb}
+                />
+
+                <div
+                  className={classes.uploadImgBan}
+                  onClick={() =>
+                    document.querySelector(".input_banImg").click()
+                  }
+                >
+                  <p>Upload Banner Image</p>
+                </div>
+                <input
+                  type="file"
+                  accept="image/*"
+                  className="input_banImg"
+                  hidden
+                  onChange={handleImageChangeBan}
+                />
               </div>
 
               <div className={classes.saveBtn}>
