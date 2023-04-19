@@ -1,10 +1,20 @@
 import React from "react";
 import styles from "./ProductDetails.module.css";
-import author_dp from "../image/author_dp.jpg";
+import Slider from "react-slick";
 
+import author_dp from "../image/author_dp.jpg";
 import product_banner from "../image/product_banner.png";
+import text_image from "../image/text_image.jpg";
 
 const ProductDetails = () => {
+  const settings = {
+    dots: true,
+    infinite: false,
+    speed: 500,
+    slidesToShow: 1,
+    slidesToScroll: 1,
+  };
+
   return (
     <div>
       <div className={styles.cover}>
@@ -60,7 +70,15 @@ const ProductDetails = () => {
             </div>
 
             <div>
-              <p>CONTENT</p>
+              <p className={styles.p2Title}>Part 1</p>
+
+              <div>
+                <Slider {...settings}>
+                  <img className={styles.contentImg} src={text_image} alt="" />
+                  <img className={styles.contentImg} src={text_image} alt="" />
+                  <img className={styles.contentImg} src={text_image} alt="" />
+                </Slider>
+              </div>
             </div>
           </div>
         </div>
