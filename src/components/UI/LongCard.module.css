@@ -117,6 +117,10 @@
   left: -20px;
 }
 
+.link {
+  text-decoration: none;
+}
+
 @media screen and (max-width: 660px) {
   .container {
     width: 200px;

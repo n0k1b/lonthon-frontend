@@ -13,6 +13,7 @@ import ScrollToTop from "./ScrollToTop";
 import DashboardPage from "./pages/DashboardPage";
 import EditProfile from "./pages/EditProfile";
 import ProductsPage from "./pages/ProductsPage";
+import ProductDetails from "./pages/ProductDetails";
 
 function App() {
   const dispatch = useDispatch();
@@ -61,6 +62,8 @@ function App() {
                 />
 
                 <Route path="/dashboard/products" element={<ProductsPage />} />
+
+                <Route path="/product/:id" element={<ProductDetails />} />
               </Routes>
             </ScrollToTop>
 

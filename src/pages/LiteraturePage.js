@@ -33,42 +33,52 @@ const FILTER_OPTIONS = [
 
 const CONTENT = [
   {
+    id: 1,
     img: card1,
     type: "Novel",
   },
   {
+    id: 2,
     img: card2,
     type: "Novel",
   },
   {
+    id: 3,
     img: card3,
     type: "Novel",
   },
   {
+    id: 4,
     img: ad,
     type: "Novel",
   },
   {
+    id: 5,
     img: card1,
     type: "Novel",
   },
   {
+    id: 6,
     img: card1,
     type: "Novel",
   },
   {
+    id: 7,
     img: card2,
     type: "Novel",
   },
   {
+    id: 8,
     img: card3,
     type: "Novel",
   },
   {
+    id: 9,
     img: ad,
     type: "Novel",
   },
   {
+    id: 10,
     img: card1,
     type: "Novel",
   },
@@ -199,7 +209,7 @@ const LiteraturePage = () => {
           <Page>
             <ContentArea>
               {currentPosts.map((item) => (
-                <LongCard img={item.img} type={item.type} />
+                <LongCard id={item.id} img={item.img} type={item.type} />
               ))}
             </ContentArea>
             <div className={styles.paginationContainer}>

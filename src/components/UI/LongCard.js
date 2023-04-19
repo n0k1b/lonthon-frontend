@@ -2,6 +2,7 @@ import React from "react";
 import styles from "./LongCard.module.css";
 // import author_dp from "../../image/author_dp.jpg";
 import GreyBtn from "../UI/GreyBtn";
+import { Link } from "react-router-dom";
 
 // import { HiOutlineHeart, HiHeart } from "react-icons/hi";
 // import { useState } from "react";
@@ -47,8 +48,9 @@ const LongCard = (props) => {
                 <HiHeart className={styles.like} onClick={likeHandler} />
               )}
             </div> */}
-
-            <GreyBtn>Read More</GreyBtn>
+            <Link className={styles.link} to={`/product/${props.id}`}>
+              <GreyBtn>Read More</GreyBtn>
+            </Link>
           </div>
         </div>
       </div>
