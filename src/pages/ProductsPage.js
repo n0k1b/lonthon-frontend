@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import styles from "./DashboardPage.module.css";
 import classes from "./ProductsPage.module.css";
 import dp from "../image/dp.jpg";
@@ -9,6 +9,13 @@ import addBtn from "../image/addBtn.png";
 import addBtn2 from "../image/addBtn2.png";
 import { BsFiletypeDoc, BsImage, BsFiletypePdf } from "react-icons/bs";
 import { BiText } from "react-icons/bi";
+import { baseURL } from "../api";
+
+import { Editor } from "@tinymce/tinymce-react";
+
+import { Document, Page, pdfjs } from "react-pdf/dist/esm/entry.webpack";
+import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer";
+// pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
 const products = [
   {
@@ -83,6 +90,13 @@ const ProductsPage = () => {
   const [pdfFile, setPdfFile] = useState(null);
   const [thumbImg, setThumbImg] = useState([]);
   const [banImg, setBanImg] = useState([]);
+  const [textContent, setTextContent] = useState("");
+  const [title, setTitle] = useState(null);
+  const [description, setDescription] = useState(null);
+  const [author, setAuthor] = useState(null);
+  const [authorTemp, setAuthorTemp] = useState("");
+
+  const [postData, setPostData] = useState({});
 
   const [num, setNum] = useState(1);
   const [authorNum, setAuthorNum] = useState([1]);
@@ -90,6 +104,13 @@ const ProductsPage = () => {
   const [addPdf, setAddPdf] = useState(false);
   const [addImage, setAddImage] = useState(false);
   const [addText, setAddText] = useState(false);
+
+  const [categoryData, setCategoryData] = useState([]);
+  const [selectedCategory, setSelectedCategory] = useState(null);
+  const [subcategoryData, setSubCategoryData] = useState([]);
+  const [selectedSubCategory, setSelectedSubCategory] = useState(null);
+  const [genreData, setGenreData] = useState([]);
+  const [selectedGenre, setSelectedGenre] = useState(null);
 
   useEffect(() => {
     const result = products.filter((data) =>
@@ -112,10 +133,8 @@ const ProductsPage = () => {
       reader.onload = () => {
         if (!image) {
           setImage([reader.result]);
-          console.log(image);
         } else {
           setImage([...image, reader.result]);
-          console.log(image);
         }
       };
     } catch {
@@ -129,13 +148,7 @@ const ProductsPage = () => {
     try {
       reader.readAsDataURL(file);
       reader.onload = () => {
-        if (!image) {
-          setThumbImg([reader.result]);
-          console.log(image);
-        } else {
-          setThumbImg([...image, reader.result]);
-          console.log(image);
-        }
+        setThumbImg(reader.result);
       };
     } catch {
       console.log("Not selected");
@@ -148,13 +161,7 @@ const ProductsPage = () => {
     try {
       reader.readAsDataURL(file);
       reader.onload = () => {
-        if (!image) {
-          setBanImg([reader.result]);
-          console.log(image);
-        } else {
-          setBanImg([...image, reader.result]);
-          console.log(image);
-        }
+        setBanImg(reader.result);
       };
     } catch {
       console.log("Not selected");
@@ -202,6 +209,153 @@ const ProductsPage = () => {
       cell: (row) => <GreyBtn>Details</GreyBtn>,
     },
   ];
+
+  const editorRef = useRef(null);
+  const log = () => {
+    if (editorRef.current) {
+      setTextContent(editorRef.current.getContent());
+    }
+    postDataHandler();
+  };
+
+  const handlePDFInputChange = (event) => {
+    const file = event.target.files[0];
+
+    const reader = new FileReader();
+    reader.onload = () => {
+      // const base64Code = reader.result.split(",")[1];
+      // setPdfFile(base64Code);
+      setPdfFile(reader.result);
+    };
+    reader.readAsDataURL(file);
+  };
+
+  const uploadHandler = () => {
+    categoryFetch();
+    setUpload(true);
+  };
+
+  const handleCatSelect = (e) => {
+    setSelectedCategory(e.target.value);
+  };
+
+  const handleSubCatSelect = (e) => {
+    setSelectedSubCategory(e.target.value);
+  };
+
+  const handleGenreSelect = (e) => {
+    setSelectedGenre(e.target.value);
+  };
+
+  //Data Fetch
+  const categoryFetch = async () => {
+    const response = await fetch(`${baseURL}/category`);
+
+    if (!response.ok) return;
+
+    const data = await response.json();
+    console.log(data);
+    setCategoryData(data.data);
+  };
+
+  const subcategoryFetch = async () => {
+    const response = await fetch(
+      `${baseURL}/category/${parseInt(selectedCategory)}`
+    );
+
+    if (!response.ok) return;
+
+    const data = await response.json();
+    console.log(data);
+    setSubCategoryData(data.data);
+  };
+
+  useEffect(() => {
+    subcategoryFetch();
+  }, [selectedCategory]);
+
+  const genreFetch = async () => {
+    const response = await fetch(
+      `${baseURL}/sub-category/${selectedSubCategory}`
+    );
+
+    if (!response.ok) return;
+
+    const data = await response.json();
+    console.log(data);
+    setGenreData(data.data);
+  };
+
+  useEffect(() => {
+    genreFetch();
+  }, [selectedSubCategory]);
+
+  //Post Data
+  const postDataHandler = async () => {
+    let content = "";
+    let cType = "";
+
+    if (addPdf) content = pdfFile;
+    if (addText) content = textContent;
+    if (addImage) content = image;
+
+    if (addPdf) cType = 3;
+    if (addText) cType = 2;
+    if (addImage) cType = 1;
+
+    if (
+      title &&
+      thumbImg &&
+      banImg &&
+      description &&
+      author &&
+      selectedCategory &&
+      selectedSubCategory &&
+      selectedGenre
+    ) {
+      const data = {
+        title: title,
+        category_id: selectedCategory,
+        sub_category_id: selectedSubCategory,
+        genre_id: selectedGenre,
+        thumbnail_image: thumbImg,
+        feature_image: banImg,
+        summary: description,
+        author: author,
+        type: 0,
+        content_type: cType,
+        content: addText ? textContent : content,
+      };
+
+      console.log(data);
+      const token = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
+
+      try {
+        console.log("start");
+        const response = await fetch(`${baseURL}/content-upload`, {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            "X-CSRF-Token": token,
+          },
+          body: JSON.stringify(data),
+        });
+
+        console.log(response);
+
+        if (!response.ok) {
+          throw new Error("Request failed");
+        }
+
+        const data2 = await response.json();
+        console.log("Response:", data2);
+      } catch (error) {
+        console.error("Error:", error);
+      }
+    } else {
+      console.log("Please fill out the form!");
+    }
+  };
 
   return (
     <div className={styles.container}>
@@ -272,7 +426,7 @@ const ProductsPage = () => {
             <img
               src={addBtn}
               className={classes.addBtn}
-              onClick={() => setUpload(true)}
+              onClick={uploadHandler}
             />
 
             <div className={classes.tableCon}>
@@ -305,47 +459,74 @@ const ProductsPage = () => {
             <p className={classes.pTitle}>Producte Upload</p>
 
             <div className={classes.filterContainer}>
-              <select className={classes.filterOp} name="filter">
+              <select
+                className={classes.filterOp}
+                name="filter"
+                onChange={handleCatSelect}
+              >
                 <option value="" disabled selected>
                   Select Category
                 </option>
-                <option value="novels">Novels</option>
-                <option value="poems">Poems</option>
-                <option value="others">Others</option>
+                {categoryData.map((op) => (
+                  <option value={op.id}>{op.name}</option>
+                ))}
               </select>
 
-              <select className={classes.filterOp} name="filter">
-                <option value="" disabled selected>
-                  Select Sub Category
-                </option>
-                <option value="novels">Novels</option>
-                <option value="poems">Poems</option>
-                <option value="others">Others</option>
-              </select>
+              {selectedCategory && (
+                <select
+                  className={classes.filterOp}
+                  name="filter"
+                  onChange={handleSubCatSelect}
+                >
+                  <option value="" disabled selected>
+                    Select Sub Category
+                  </option>
+                  {subcategoryData.map((op) => (
+                    <option value={op.id}>{op.name}</option>
+                  ))}
+                </select>
+              )}
 
-              <select className={classes.filterOp} name="filter">
-                <option value="" disabled selected>
-                  Genre
-                </option>
-                <option value="novels">Novels</option>
-                <option value="poems">Poems</option>
-                <option value="others">Others</option>
-              </select>
+              {selectedSubCategory && (
+                <select
+                  className={classes.filterOp}
+                  name="filter"
+                  onClick={handleGenreSelect}
+                >
+                  <option value="" disabled selected>
+                    Genre
+                  </option>
+                  {genreData.map((op) => (
+                    <option value={op.id}>{op.name}</option>
+                  ))}
+                </select>
+              )}
             </div>
 
             <div className={classes.addPForm}>
               <div>
                 <p className={classes.formTitle}>Title</p>
-                <input className={classes.inputText} type="text" />
+                <input
+                  className={classes.inputText}
+                  type="text"
+                  onChange={(e) => {
+                    setTitle(e.target.value);
+                  }}
+                />
               </div>
 
               <div>
                 <p className={classes.formTitle}>Description</p>
-                <textarea className={classes.ayInput} />
+                <textarea
+                  className={classes.ayInput}
+                  onChange={(e) => {
+                    setDescription(e.target.value);
+                  }}
+                />
               </div>
 
               <div className={classes.nameCon}>
-                <div className={classes.lanSelectCon}>
+                {/* <div className={classes.lanSelectCon}>
                   <p className={classes.formTitle}>Language</p>
 
                   <select className={classes.filterOpUp} name="filter">
@@ -356,17 +537,34 @@ const ProductsPage = () => {
                     <option value="poems">Poems</option>
                     <option value="others">Others</option>
                   </select>
-                </div>
+                </div> */}
               </div>
 
               <div className={classes.authorNameSec}>
                 {authorNum.map((num) => (
                   <div>
                     <p className={classes.formTitle}>Author Name {num}</p>
-                    <input className={classes.inputText} type="text" />
+                    <input
+                      className={classes.inputText}
+                      type="text"
+                      onChange={(e) => {
+                        setAuthorTemp(e.target.value);
+                      }}
+                    />
+                    <div
+                      className={classes.addBtnAuth}
+                      onClick={() => {
+                        if (author) {
+                          setAuthor([...author, authorTemp]);
+                        } else {
+                          setAuthor([authorTemp]);
+                        }
+                      }}
+                    >
+                      Add
+                    </div>
                   </div>
                 ))}
-
                 <img
                   className={classes.addimgBtn}
                   src={addBtn2}
@@ -393,7 +591,27 @@ const ProductsPage = () => {
               {addText && (
                 <div>
                   <p className={classes.formTitle}>Content</p>
-                  <textarea className={classes.contentInput} />
+                  {/* <textarea className={classes.contentInput} /> */}
+                  <Editor
+                    onInit={(evt, editor) => (editorRef.current = editor)}
+                    initialValue=""
+                    init={{
+                      height: 500,
+                      menubar: false,
+                      plugins: [
+                        "advlist autolink lists link image charmap print preview anchor",
+                        "searchreplace visualblocks code fullscreen",
+                        "insertdatetime media table paste code help wordcount",
+                      ],
+                      toolbar:
+                        "undo redo | formatselect | " +
+                        "bold italic backcolor | alignleft aligncenter " +
+                        "alignright alignjustify | bullist numlist outdent indent | " +
+                        "removeformat | help",
+                      content_style:
+                        "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
+                    }}
+                  />
                 </div>
               )}
 
@@ -413,6 +631,10 @@ const ProductsPage = () => {
                     hidden
                     onChange={handleImageChange}
                   />
+                  {image &&
+                    image.map((item) => (
+                      <img className={classes.previewImg} src={item} />
+                    ))}
                   {addImg && (
                     <img
                       className={classes.addimgBtn}
@@ -440,7 +662,7 @@ const ProductsPage = () => {
                     type="file"
                     accept="application/pdf"
                     hidden
-                    onChange={(e) => setPdfFile(e.target.files[0])}
+                    onChange={handlePDFInputChange}
                   />
                 </div>
               )}
@@ -462,6 +684,9 @@ const ProductsPage = () => {
                   hidden
                   onChange={handleImageChangeThumb}
                 />
+                {thumbImg && (
+                  <img className={classes.previewImg} src={thumbImg} />
+                )}
 
                 <div
                   className={classes.uploadImgBan}
@@ -478,9 +703,10 @@ const ProductsPage = () => {
                   hidden
                   onChange={handleImageChangeBan}
                 />
+                {banImg && <img className={classes.previewImg} src={banImg} />}
               </div>
 
-              <div className={classes.saveBtn}>
+              <div className={classes.saveBtn} onClick={log}>
                 <GreyBtn>Save</GreyBtn>
               </div>
             </div>
@@ -490,5 +716,4 @@ const ProductsPage = () => {
     </div>
   );
 };
-
 export default ProductsPage;

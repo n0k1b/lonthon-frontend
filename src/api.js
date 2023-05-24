@@ -1,1 +1,1 @@
-export const baseURL = "https://www.lonthonaloy.com/admin/public/api";
+export const baseURL = "https://admin.lonthonaloy.com/api";

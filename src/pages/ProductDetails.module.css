@@ -106,5 +106,21 @@
   margin-bottom: 50px;
 }
 
-.contentImg {
+.pdfCon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.pdfBtnCon {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.pdfBtn {
+  font-size: 30px;
+  color: white;
+  margin-right: 10px;
+  margin-top: 20px;
 }

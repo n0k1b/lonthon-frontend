@@ -1,5 +1,5 @@
 import styled from "@emotion/styled";
-import React, { useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import styles from "./LiteraturePage.module.css";
 
 import Box from "@mui/material/Box";
@@ -14,6 +14,7 @@ import card1 from "../image/card1.png";
 import card2 from "../image/card2.png";
 import card3 from "../image/card3.png";
 import LongCard from "../components/UI/LongCard";
+import { baseURL } from "../api";
 
 const FILTER_OPTIONS = [
   "History",
@@ -89,6 +90,7 @@ const LiteraturePage = () => {
   const [filters, setFilters] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [postsPerPage, setPostsPerPage] = useState(6);
+  const [contentData, setContentData] = useState([]);
   const toggleFilter = useRef();
 
   const filterToggleHandler = () => {
@@ -121,6 +123,21 @@ const LiteraturePage = () => {
     }
   };
 
+  const contentDataFetch = async () => {
+    const response = await fetch(`${baseURL}/content`);
+
+    if (!response.ok) return;
+
+    const data = await response.json();
+
+    console.log(data);
+    setContentData(data.data);
+  };
+
+  useEffect(() => {
+    contentDataFetch();
+  }, []);
+
   return (
     <div>
       <div className={styles.cover}>
@@ -128,15 +145,6 @@ const LiteraturePage = () => {
           <p className={styles.title}>Novel</p>
           <p className={styles.route}>Literature &gt; Novel</p>
         </div>
-
-        {/* <div className={styles.searchBox}>
-          <input
-            className={styles.search}
-            type="text"
-            placeholder="Search here..."
-          />
-          <SearchBtn />
-        </div> */}
       </div>
 
       <Container>
@@ -208,9 +216,9 @@ const LiteraturePage = () => {
 
           <Page>
             <ContentArea>
-              {currentPosts.map((item) => (
-                <LongCard id={item.id} img={item.img} type={item.type} />
-              ))}
+              {/* {contentData.map((item) => (
+                <LongCard data={item} />
+              ))} */}
             </ContentArea>
             <div className={styles.paginationContainer}>
               <p className={styles.pagiText}>

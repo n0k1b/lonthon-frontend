@@ -185,3 +185,19 @@
 .TBSec {
   margin-top: 50px;
 }
+
+.addBtnAuth {
+  margin-top: 10px;
+  border: 1px solid #6d6d6d;
+  padding: 5px 10px;
+  cursor: pointer;
+  width: fit-content;
+  color: white;
+  background-color: #6d6d6d;
+}
+
+.previewImg {
+  width: 100px;
+  margin-right: 10px;
+  margin-top: 10px;
+}
