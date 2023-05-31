@@ -90,13 +90,13 @@ const ProductDetails = () => {
                     <p className={styles.productDes}>{content.summary}</p>
 
                     <div className={styles.authorSec}>
-                      <img
+                      {/* <img
                         className={styles.authorDp}
                         src={author_dp}
                         alt="author"
-                      />
+                      /> */}
                       <div>
-                        <p className={styles.authorName}>Adnan Hasan</p>
+                        <p className={styles.authorName}>{content.author}</p>
                       </div>
                     </div>
 
@@ -119,7 +119,7 @@ const ProductDetails = () => {
                 </div>
 
                 <div className={styles.part2}>
-                  <div>
+                  {/* <div>
                     <p className={styles.p2Title}>About</p>
                     <p className={styles.p2Text}>
                       Lorem ipsum dolor sit amet consectetur. Aliquam at
@@ -127,7 +127,7 @@ const ProductDetails = () => {
                       in nulla. Tellus viverra non nulla parturient non
                       consectetur sit.
                     </p>
-                  </div>
+                  </div> */}
 
                   <div>
                     <p className={styles.p2Title}>Part 1</p>
@@ -135,9 +135,14 @@ const ProductDetails = () => {
                     <div>
                       {content.media_type !== 3 && (
                         <Slider {...settings}>
-                          <img src={text_image} alt="" />
-                          <img src={text_image} alt="" />
-                          <img src={text_image} alt="" />
+                          {content.media.map((item, i) => (
+                            <img
+                              key={i}
+                              className={styles.sliderImg}
+                              src={item.media_url}
+                              alt=""
+                            />
+                          ))}
                         </Slider>
                       )}
 

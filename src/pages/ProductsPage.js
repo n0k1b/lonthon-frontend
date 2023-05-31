@@ -12,10 +12,16 @@ import { BiText } from "react-icons/bi";
 import { baseURL } from "../api";
 
 import { Editor } from "@tinymce/tinymce-react";
+import axios from "axios";
 
-import { Document, Page, pdfjs } from "react-pdf/dist/esm/entry.webpack";
-import DocViewer, { DocViewerRenderers } from "@cyntler/react-doc-viewer";
-// pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
+import Stack from "@mui/material/Stack";
+import Button from "@mui/material/Button";
+import Snackbar from "@mui/material/Snackbar";
+import MuiAlert from "@mui/material/Alert";
+
+const Alert = React.forwardRef(function Alert(props, ref) {
+  return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
+});
 
 const products = [
   {
@@ -81,6 +87,7 @@ const products = [
 ];
 
 const ProductsPage = () => {
+  const imageRef = useRef();
   const [search, setSearch] = useState("");
   const [data, setData] = useState(products);
   const [upload, setUpload] = useState(false);
@@ -93,10 +100,8 @@ const ProductsPage = () => {
   const [textContent, setTextContent] = useState("");
   const [title, setTitle] = useState(null);
   const [description, setDescription] = useState(null);
-  const [author, setAuthor] = useState(null);
+  const [author, setAuthor] = useState([]);
   const [authorTemp, setAuthorTemp] = useState("");
-
-  const [postData, setPostData] = useState({});
 
   const [num, setNum] = useState(1);
   const [authorNum, setAuthorNum] = useState([1]);
@@ -111,6 +116,11 @@ const ProductsPage = () => {
   const [selectedSubCategory, setSelectedSubCategory] = useState(null);
   const [genreData, setGenreData] = useState([]);
   const [selectedGenre, setSelectedGenre] = useState(null);
+
+  const [formFillUpError, setFormFillUpError] = useState(false);
+  const [submittedPopUp, setSubmittedPopUp] = useState(false);
+  const [submitMsg, setSubmitMsg] = useState("");
+  const [removeMsg, setRemoveMsg] = useState(false);
 
   useEffect(() => {
     const result = products.filter((data) =>
@@ -247,6 +257,20 @@ const ProductsPage = () => {
     setSelectedGenre(e.target.value);
   };
 
+  const handleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setFormFillUpError(false);
+  };
+
+  const submitHandleClose = (event, reason) => {
+    if (reason === "clickaway") {
+      return;
+    }
+    setSubmittedPopUp(false);
+  };
+
   //Data Fetch
   const categoryFetch = async () => {
     const response = await fetch(`${baseURL}/category`);
@@ -299,9 +323,9 @@ const ProductsPage = () => {
     if (addText) content = textContent;
     if (addImage) content = image;
 
-    if (addPdf) cType = 3;
+    if (addPdf) cType = 1;
     if (addText) cType = 2;
-    if (addImage) cType = 1;
+    if (addImage) cType = 0;
 
     if (
       title &&
@@ -332,6 +356,15 @@ const ProductsPage = () => {
 
       try {
         console.log("start");
+        // const response = await fetch(`https://admin.lonthonaloy.com/api/test`, {
+        //   method: "POST",
+        //   headers: {
+        //     "Content-Type": "application/json",
+        //     "X-CSRF-Token": token,
+        //   },
+        //   body: JSON.stringify(data),
+        // });
+
         const response = await fetch(`${baseURL}/content-upload`, {
           method: "POST",
           headers: {
@@ -341,20 +374,45 @@ const ProductsPage = () => {
           body: JSON.stringify(data),
         });
 
-        console.log(response);
+        // const response = await axios.post(`${baseURL}/content-upload`, data, {
+        //   headers: {
+        //     "Content-Type": "application/json",
+        //   },
+        // });
+
+        console.log("response:", response);
 
         if (!response.ok) {
           throw new Error("Request failed");
         }
 
         const data2 = await response.json();
-        console.log("Response:", data2);
+        console.log("Data:", data2);
+
+        setSubmitMsg(data2.message);
+        setSubmittedPopUp(true);
+        goBackHandler();
       } catch (error) {
         console.error("Error:", error);
+        console.log("Error");
       }
     } else {
       console.log("Please fill out the form!");
+      setFormFillUpError(true);
     }
+  };
+
+  const goBackHandler = () => {
+    setPdfFile(null);
+    setThumbImg([]);
+    setBanImg([]);
+    setTextContent("");
+    setTitle(null);
+    setDescription(null);
+    setAuthor([]);
+    setAuthorTemp("");
+
+    setUpload(false);
   };
 
   return (
@@ -453,7 +511,7 @@ const ProductsPage = () => {
 
         {upload && (
           <div className={classes.uploadSection}>
-            <p className={classes.back} onClick={() => setUpload(false)}>
+            <p className={classes.back} onClick={goBackHandler}>
               Go back
             </p>
             <p className={classes.pTitle}>Producte Upload</p>
@@ -514,7 +572,6 @@ const ProductsPage = () => {
                   }}
                 />
               </div>
-
               <div>
                 <p className={classes.formTitle}>Description</p>
                 <textarea
@@ -524,7 +581,6 @@ const ProductsPage = () => {
                   }}
                 />
               </div>
-
               <div className={classes.nameCon}>
                 {/* <div className={classes.lanSelectCon}>
                   <p className={classes.formTitle}>Language</p>
@@ -539,30 +595,19 @@ const ProductsPage = () => {
                   </select>
                 </div> */}
               </div>
-
               <div className={classes.authorNameSec}>
-                {authorNum.map((num) => (
-                  <div>
+                {authorNum.map((num, index) => (
+                  <div key={index}>
                     <p className={classes.formTitle}>Author Name {num}</p>
                     <input
                       className={classes.inputText}
                       type="text"
                       onChange={(e) => {
-                        setAuthorTemp(e.target.value);
+                        const updatedAuthors = [...author];
+                        updatedAuthors[index] = e.target.value;
+                        setAuthor(updatedAuthors);
                       }}
                     />
-                    <div
-                      className={classes.addBtnAuth}
-                      onClick={() => {
-                        if (author) {
-                          setAuthor([...author, authorTemp]);
-                        } else {
-                          setAuthor([authorTemp]);
-                        }
-                      }}
-                    >
-                      Add
-                    </div>
                   </div>
                 ))}
                 <img
@@ -572,7 +617,6 @@ const ProductsPage = () => {
                   onClick={authorHandler}
                 />
               </div>
-
               <div className={classes.uploadContentCon}>
                 <p className={classes.ucTitle}>Upload your content</p>
                 <div>
@@ -587,7 +631,6 @@ const ProductsPage = () => {
                   <BiText className={classes.docLogo} onClick={textUploadSec} />
                 </div>
               </div>
-
               {addText && (
                 <div>
                   <p className={classes.formTitle}>Content</p>
@@ -614,16 +657,19 @@ const ProductsPage = () => {
                   />
                 </div>
               )}
-
               {addImage && (
                 <div>
                   <p className={classes.formTitle}>Content</p>
-                  <div
-                    className={classes.uploadImg}
-                    onClick={() => document.querySelector(".input_img").click()}
-                  >
-                    <p>Upload Image</p>
-                  </div>
+                  {image === null && (
+                    <div
+                      className={classes.uploadImg}
+                      onClick={() =>
+                        document.querySelector(".input_img").click()
+                      }
+                    >
+                      <p>Upload Image</p>
+                    </div>
+                  )}
                   <input
                     type="file"
                     accept="image/*"
@@ -632,8 +678,23 @@ const ProductsPage = () => {
                     onChange={handleImageChange}
                   />
                   {image &&
-                    image.map((item) => (
-                      <img className={classes.previewImg} src={item} />
+                    image.map((item, i) => (
+                      <div className={classes.imagePrevCon}>
+                        <img
+                          key={i}
+                          className={classes.previewImg}
+                          src={item}
+                          onMouseEnter={() => setRemoveMsg(true)}
+                          onMouseLeave={() => setRemoveMsg(false)}
+                          onClick={(e) => {
+                            const selectedImg = image.filter(
+                              (item) => item !== e.target.src
+                            );
+                            setImage(selectedImg);
+                          }}
+                        />
+                        <p className={classes.imagePrevRem}>Click to Remove</p>
+                      </div>
                     ))}
                   {addImg && (
                     <img
@@ -647,7 +708,6 @@ const ProductsPage = () => {
                   )}
                 </div>
               )}
-
               {addPdf && (
                 <div className={classes.addPDF}>
                   <p className={classes.formTitle}>Content</p>
@@ -666,7 +726,6 @@ const ProductsPage = () => {
                   />
                 </div>
               )}
-
               <div className={classes.TBSec}>
                 <p className={classes.formTitle}>Thumbnail and Banner</p>
                 <div
@@ -705,7 +764,6 @@ const ProductsPage = () => {
                 />
                 {banImg && <img className={classes.previewImg} src={banImg} />}
               </div>
-
               <div className={classes.saveBtn} onClick={log}>
                 <GreyBtn>Save</GreyBtn>
               </div>
@@ -713,6 +771,29 @@ const ProductsPage = () => {
           </div>
         )}
       </div>
+      <Snackbar
+        open={formFillUpError}
+        autoHideDuration={6000}
+        onClose={handleClose}
+      >
+        <Alert onClose={handleClose} severity="warning" sx={{ width: "100%" }}>
+          Please fill out the form!
+        </Alert>
+      </Snackbar>
+
+      <Snackbar
+        open={submittedPopUp}
+        autoHideDuration={6000}
+        onClose={submitHandleClose}
+      >
+        <Alert
+          onClose={submitHandleClose}
+          severity="success"
+          sx={{ width: "100%" }}
+        >
+          {submitMsg}
+        </Alert>
+      </Snackbar>
     </div>
   );
 };
