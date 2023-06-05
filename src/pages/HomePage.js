@@ -8,6 +8,7 @@ import { useSelector } from "react-redux";
 
 const HomePage = () => {
   const homepageData = useSelector((state) => state.homepage.homepageData);
+  const contentByCat = useSelector((state) => state.homepage.contentByCat);
 
   return (
     <>
@@ -36,7 +37,12 @@ const HomePage = () => {
         />
       </div>
 
-      <div className={styles.content_container}>
+      {contentByCat.map((item, i) => (
+        <div key={i} className={styles.content_container}>
+          <LiteratureSection data={item} />
+        </div>
+      ))}
+      {/* <div className={styles.content_container}>
         <LiteratureSection />
       </div>
 
@@ -46,7 +52,7 @@ const HomePage = () => {
 
       <div className={styles.media_content_container}>
         <AudioSection />
-      </div>
+      </div> */}
 
       <div className={styles.about}>
         <p className={styles.about_title}>About Us</p>

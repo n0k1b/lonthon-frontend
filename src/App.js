@@ -19,6 +19,9 @@ function App() {
   const dispatch = useDispatch();
   const isLoading = useSelector((state) => state.homepage.isLoading);
   const [favIcon, setFavIcon] = useState("");
+  const [navbarMenu, setNavbarMenu] = useState();
+  const [conByCat, setConByCat] = useState();
+  const [busSettings, setBusSettings] = useState();
 
   const getBusinessSettingsData = async () => {
     dispatch(homepageActions.setIsLoading(true));
@@ -30,17 +33,56 @@ function App() {
 
     console.log(data.data[0]);
     dispatch(homepageActions.setHomepageData(data.data[0]));
-    dispatch(homepageActions.setIsLoading(false));
+    // dispatch(homepageActions.setIsLoading(false));
     setFavIcon(data.data[0].favicon);
+    setBusSettings(true);
+    getContentByCategory();
+    // getNavbarMenu();
+  };
+
+  const getContentByCategory = async () => {
+    dispatch(homepageActions.setIsLoading(true));
+    const response = await fetch(`${baseURL}/content-by-category`);
+    console.log("res => ", response);
+
+    if (!response.ok) return;
+
+    const data = await response.json();
+
+    console.log(data.data);
+    dispatch(homepageActions.setContentByCat(data.data));
+    dispatch(homepageActions.setIsLoading(false));
+    setConByCat(true);
+  };
+
+  const getNavbarMenu = async () => {
+    const response = await fetch(`${baseURL}/category`);
+
+    if (!response.ok) return;
+
+    const data = await response.json();
+
+    console.log(data.data);
+    setNavbarMenu(data.data);
+    dispatch(homepageActions.setIsLoading(false));
   };
 
   useEffect(() => {
+    // dispatch(homepageActions.setIsLoading(true));
     getBusinessSettingsData();
   }, []);
+
+  // useEffect(() => {
+  //   if (navbarMenu && conByCat && busSettings)
+  //     dispatch(homepageActions.setIsLoading(false));
+  // }, [navbarMenu, conByCat, busSettings]);
+
+  // console.log([navbarMenu, NavbarMenuItems], "HHHHH");
 
   return (
     <Router>
       <div className={styles.container}>
+        {/* <Navbar menuItems={navbarMenu} /> */}
         <Navbar menuItems={NavbarMenuItems} />
 
         {!isLoading && (

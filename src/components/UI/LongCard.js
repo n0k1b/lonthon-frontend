@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import styles from "./LongCard.module.css";
 // import author_dp from "../../image/author_dp.jpg";
 import GreyBtn from "../UI/GreyBtn";
@@ -7,8 +7,12 @@ import { Link } from "react-router-dom";
 // import { HiOutlineHeart, HiHeart } from "react-icons/hi";
 // import { useState } from "react";
 
-const LongCard = (props) => {
+const LongCard = ({ data }) => {
+  // const [type, setType] = useState();
+
   // const [liked, setLiked] = useState(false);
+
+  // if (data.media_type === 0) setType("")
 
   // const likeHandler = () => {
   //   setLiked(!liked);
@@ -16,18 +20,14 @@ const LongCard = (props) => {
   return (
     <div className={styles.container}>
       <div className={styles.imgCon}>
-        <img className={styles.img} alt="" src={props.img} />
+        <img className={styles.img} alt="" src={data.thumbnail_image} />
       </div>
       <div className={styles.contentCon}>
         <div className={styles.text_area}>
-          <p className={styles.type}>{props.type}</p>
-          <p className={styles.title}>Backbone</p>
-          <p className={styles.author2}>Adnan Hasan</p>
-          <p className={styles.des}>
-            Lorem ipsum dolor sit amet consectetur. Est amet placerat neque
-            fermentum nulla facilisis venenatis aliquam pretium. Pharetra sit
-            venenatis ornare aliquam ornare amet volutpat.
-          </p>
+          <p className={styles.type}>Novel</p>
+          <p className={styles.title}>{data.title}</p>
+          <p className={styles.author2}>{data.author}</p>
+          <p className={styles.des}>{data.summary}</p>
         </div>
 
         <div className={styles.authorCon}>
@@ -48,7 +48,8 @@ const LongCard = (props) => {
                 <HiHeart className={styles.like} onClick={likeHandler} />
               )}
             </div> */}
-            <Link className={styles.link} to={`/product/${props.id}`}>
+
+            <Link className={styles.link} to={`/product/${data.id}`}>
               <GreyBtn>Read More</GreyBtn>
             </Link>
           </div>

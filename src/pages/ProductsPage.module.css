@@ -206,6 +206,7 @@
   color: white;
   background-color: #6d6d6d;
   padding: 2px 5px;
+  cursor: pointer;
 }
 
 .previewImg {

@@ -1,6 +1,6 @@
 import { createSlice } from "@reduxjs/toolkit";
 
-const initialState = { homepageData: [], isLoading: true };
+const initialState = { homepageData: [], isLoading: true, contentByCat: [] };
 
 export const homepageSlice = createSlice({
   name: "homepage",
@@ -11,6 +11,9 @@ export const homepageSlice = createSlice({
     },
     setIsLoading: (state, action) => {
       state.isLoading = action.payload;
+    },
+    setContentByCat: (state, action) => {
+      state.contentByCat = action.payload;
     },
   },
 });

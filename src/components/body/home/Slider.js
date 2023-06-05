@@ -9,7 +9,7 @@ import card1 from "../../../image/card1.png";
 import card2 from "../../../image/card2.png";
 import card3 from "../../../image/card3.png";
 
-const MultipleItems = () => {
+const MultipleItems = ({ data }) => {
   const slider = useRef(null);
   const settings = {
     className: "center",
@@ -49,18 +49,11 @@ const MultipleItems = () => {
         →
       </button>
       <Slider ref={slider} {...settings}>
-        <div>
-          <LongCard img={card2} type="Novel" />
-        </div>
-        <div>
-          <LongCard img={card1} type="Poem" />
-        </div>
-        <div>
-          <LongCard img={card3} type="Others" />
-        </div>
-        <div>
-          <LongCard img={card2} type="Novel" />
-        </div>
+        {data.map((item, i) => (
+          <div key={i}>
+            <LongCard data={item} />
+          </div>
+        ))}
       </Slider>
     </div>
   );

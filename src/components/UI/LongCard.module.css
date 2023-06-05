@@ -65,6 +65,8 @@
   color: #6d6d6d;
   font-size: 15px;
   margin: 0 20px;
+  height: 250px;
+  overflow: hidden;
 }
 
 .author_img {

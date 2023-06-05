@@ -87,7 +87,6 @@ const products = [
 ];
 
 const ProductsPage = () => {
-  const imageRef = useRef();
   const [search, setSearch] = useState("");
   const [data, setData] = useState(products);
   const [upload, setUpload] = useState(false);
@@ -95,8 +94,8 @@ const ProductsPage = () => {
   const [addImg, setAddImg] = useState(false);
 
   const [pdfFile, setPdfFile] = useState(null);
-  const [thumbImg, setThumbImg] = useState([]);
-  const [banImg, setBanImg] = useState([]);
+  const [thumbImg, setThumbImg] = useState(null);
+  const [banImg, setBanImg] = useState(null);
   const [textContent, setTextContent] = useState("");
   const [title, setTitle] = useState(null);
   const [description, setDescription] = useState(null);
@@ -120,7 +119,6 @@ const ProductsPage = () => {
   const [formFillUpError, setFormFillUpError] = useState(false);
   const [submittedPopUp, setSubmittedPopUp] = useState(false);
   const [submitMsg, setSubmitMsg] = useState("");
-  const [removeMsg, setRemoveMsg] = useState(false);
 
   useEffect(() => {
     const result = products.filter((data) =>
@@ -132,6 +130,9 @@ const ProductsPage = () => {
   useEffect(() => {
     if (image) {
       setAddImg(true);
+      if (image.length === 0) {
+        setImage(null);
+      }
     }
   }, [image]);
 
@@ -684,8 +685,7 @@ const ProductsPage = () => {
                           key={i}
                           className={classes.previewImg}
                           src={item}
-                          onMouseEnter={() => setRemoveMsg(true)}
-                          onMouseLeave={() => setRemoveMsg(false)}
+                          id={`contentRem${i}`}
                           onClick={(e) => {
                             const selectedImg = image.filter(
                               (item) => item !== e.target.src
@@ -693,7 +693,14 @@ const ProductsPage = () => {
                             setImage(selectedImg);
                           }}
                         />
-                        <p className={classes.imagePrevRem}>Click to Remove</p>
+                        <p
+                          className={classes.imagePrevRem}
+                          onClick={() => {
+                            document.querySelector(`#contentRem${i}`).click();
+                          }}
+                        >
+                          Click to Remove
+                        </p>
                       </div>
                     ))}
                   {addImg && (
@@ -728,14 +735,16 @@ const ProductsPage = () => {
               )}
               <div className={classes.TBSec}>
                 <p className={classes.formTitle}>Thumbnail and Banner</p>
-                <div
-                  className={classes.uploadImg}
-                  onClick={() =>
-                    document.querySelector(".input_thumbImg").click()
-                  }
-                >
-                  <p>Upload Thumbnail Image</p>
-                </div>
+                {!thumbImg && (
+                  <div
+                    className={classes.uploadImg}
+                    onClick={() =>
+                      document.querySelector(".input_thumbImg").click()
+                    }
+                  >
+                    <p>Upload Thumbnail Image</p>
+                  </div>
+                )}
                 <input
                   type="file"
                   accept="image/*"
@@ -744,17 +753,36 @@ const ProductsPage = () => {
                   onChange={handleImageChangeThumb}
                 />
                 {thumbImg && (
-                  <img className={classes.previewImg} src={thumbImg} />
+                  <div className={classes.imagePrevCon}>
+                    <img
+                      className={classes.previewImg}
+                      src={thumbImg}
+                      onClick={() => {
+                        setThumbImg(null);
+                      }}
+                      id="thumbImgRem"
+                    />
+                    <p
+                      className={classes.imagePrevRem}
+                      onClick={() => {
+                        document.querySelector("#thumbImgRem").click();
+                      }}
+                    >
+                      Click to Remove
+                    </p>
+                  </div>
                 )}
 
-                <div
-                  className={classes.uploadImgBan}
-                  onClick={() =>
-                    document.querySelector(".input_banImg").click()
-                  }
-                >
-                  <p>Upload Banner Image</p>
-                </div>
+                {!banImg && (
+                  <div
+                    className={classes.uploadImgBan}
+                    onClick={() =>
+                      document.querySelector(".input_banImg").click()
+                    }
+                  >
+                    <p>Upload Banner Image</p>
+                  </div>
+                )}
                 <input
                   type="file"
                   accept="image/*"
@@ -762,7 +790,26 @@ const ProductsPage = () => {
                   hidden
                   onChange={handleImageChangeBan}
                 />
-                {banImg && <img className={classes.previewImg} src={banImg} />}
+                {banImg && (
+                  <div className={classes.imagePrevCon}>
+                    <img
+                      className={classes.previewImg}
+                      src={banImg}
+                      onClick={() => {
+                        setBanImg(null);
+                      }}
+                      id="banImgRem"
+                    />
+                    <p
+                      className={classes.imagePrevRem}
+                      onClick={() => {
+                        document.querySelector("#banImgRem").click();
+                      }}
+                    >
+                      Click to Remove
+                    </p>
+                  </div>
+                )}
               </div>
               <div className={classes.saveBtn} onClick={log}>
                 <GreyBtn>Save</GreyBtn>

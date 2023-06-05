@@ -67,10 +67,12 @@ const Navbar = ({ menuItems }) => {
         </div>
 
         <div className={styles.nav_container}>
-          <div className={styles.logo_container}>
-            <img className={styles.logo} alt="logo" src={logo} />
-            <p>Lonthon</p>
-          </div>
+          <Link className={styles.link} to="/">
+            <div className={styles.logo_container}>
+              <img className={styles.logo} alt="logo" src={logo} />
+              <p>Lonthon</p>
+            </div>
+          </Link>
           <div className={`${styles.links} mobile-links`} ref={toggleMenu}>
             {menuItems.map((menu, index) => (
               <>

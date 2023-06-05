@@ -10,9 +10,11 @@ import {
   BsFillArrowRightCircleFill,
 } from "react-icons/bs";
 
-import { Document, Page } from "react-pdf";
 import { useParams } from "react-router-dom";
 import { baseURL } from "../api";
+
+import { Document, Page, pdfjs } from "react-pdf";
+pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
 const ProductDetails = () => {
   const params = useParams();
@@ -146,10 +148,10 @@ const ProductDetails = () => {
                         </Slider>
                       )}
 
-                      {content.media_type === 3 && (
+                      {content.media_type === 1 && (
                         <div className={styles.pdfCon}>
                           <Document
-                            file={content.media[0].media_url}
+                            file={`data:application/pdf;base64,${content.media[0].media_url}`}
                             onLoadSuccess={onDocumentLoadSuccess}
                             onLoadError={console.error}
                           >
@@ -158,7 +160,7 @@ const ProductDetails = () => {
                         </div>
                       )}
                     </div>
-                    {content.media_type === 3 && (
+                    {content.media_type === 1 && (
                       <div className={styles.pdfBtnCon}>
                         <BsFillArrowLeftCircleFill
                           className={styles.pdfBtn}
