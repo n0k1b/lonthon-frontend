@@ -64,6 +64,7 @@
 
 .banner {
   width: 60%;
+  height: 500px;
 }
 
 .productTitle {
@@ -92,6 +93,7 @@
 .part2 {
   background: #353535;
   padding: 58px 65px;
+  margin-top: 40px;
 }
 
 .p2Title {
@@ -125,6 +127,6 @@
   margin-top: 20px;
 }
 
-/* .sliderImg {
-  height: 500px;
-} */
+.sliderImg {
+  height: 1000px;
+}

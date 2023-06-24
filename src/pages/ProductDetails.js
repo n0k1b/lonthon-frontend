@@ -13,6 +13,9 @@ import {
 import { useParams } from "react-router-dom";
 import { baseURL } from "../api";
 
+import CircularProgress from "@mui/material/CircularProgress";
+import Box from "@mui/material/Box";
+
 import { Document, Page, pdfjs } from "react-pdf";
 pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjs.version}/pdf.worker.js`;
 
@@ -74,6 +77,19 @@ const ProductDetails = () => {
 
   return (
     <>
+      {loading && (
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            marginTop: "50px",
+            marginBottom: "500px",
+          }}
+        >
+          <CircularProgress color="inherit" />
+        </Box>
+      )}
+
       {!loading && (
         <>
           <div>
@@ -121,21 +137,9 @@ const ProductDetails = () => {
                 </div>
 
                 <div className={styles.part2}>
-                  {/* <div>
-                    <p className={styles.p2Title}>About</p>
-                    <p className={styles.p2Text}>
-                      Lorem ipsum dolor sit amet consectetur. Aliquam at
-                      elementum suspendisse feugiat. Pellentesque aliquam in ac
-                      in nulla. Tellus viverra non nulla parturient non
-                      consectetur sit.
-                    </p>
-                  </div> */}
-
                   <div>
-                    <p className={styles.p2Title}>Part 1</p>
-
                     <div>
-                      {content.media_type !== 3 && (
+                      {content.media_type === 0 && (
                         <Slider {...settings}>
                           {content.media.map((item, i) => (
                             <img

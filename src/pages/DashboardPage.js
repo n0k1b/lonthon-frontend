@@ -62,8 +62,8 @@ const DashboardPage = () => {
             <p className={styles.options}>Contact</p>
           </Link>
 
-          <Link className={styles.link} to="/dashboard/products">
-            <p className={styles.options}>Products</p>
+          <Link className={styles.link} to="/dashboard/contents">
+            <p className={styles.options}>Contents</p>
           </Link>
         </div>
       </div>

@@ -83,7 +83,9 @@ const Navbar = ({ menuItems }) => {
                         <p className={styles.nav_link}>{menu.label}</p>
                       </Link>
                     ) : (
-                      <GreyBtn>{menu.label}</GreyBtn>
+                      <Link to={menu.url} className={styles.link} key={index}>
+                        <GreyBtn>{menu.label}</GreyBtn>
+                      </Link>
                     )}
                   </>
                 ) : (

@@ -15,6 +15,11 @@ import EditProfile from "./pages/EditProfile";
 import ProductsPage from "./pages/ProductsPage";
 import ProductDetails from "./pages/ProductDetails";
 
+import CircularProgress from "@mui/material/CircularProgress";
+import Box from "@mui/material/Box";
+import LoginPage from "./pages/LoginPage";
+import Signup from "./pages/Signup";
+
 function App() {
   const dispatch = useDispatch();
   const isLoading = useSelector((state) => state.homepage.isLoading);
@@ -85,6 +90,18 @@ function App() {
         {/* <Navbar menuItems={navbarMenu} /> */}
         <Navbar menuItems={NavbarMenuItems} />
 
+        {isLoading && (
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              marginTop: "50px",
+            }}
+          >
+            <CircularProgress color="inherit" />
+          </Box>
+        )}
+
         {!isLoading && (
           <>
             <Helmet>
@@ -103,9 +120,13 @@ function App() {
                   element={<EditProfile />}
                 />
 
-                <Route path="/dashboard/products" element={<ProductsPage />} />
+                <Route path="/dashboard/contents" element={<ProductsPage />} />
 
                 <Route path="/product/:id" element={<ProductDetails />} />
+
+                <Route path="/login" element={<LoginPage />} />
+
+                <Route path="/signup" element={<Signup />} />
               </Routes>
             </ScrollToTop>
 

@@ -7,7 +7,7 @@ import DataTable from "react-data-table-component";
 import GreyBtn from "../components/UI/GreyBtn";
 import addBtn from "../image/addBtn.png";
 import addBtn2 from "../image/addBtn2.png";
-import { BsFiletypeDoc, BsImage, BsFiletypePdf } from "react-icons/bs";
+import { BsImage, BsFiletypePdf, BsCameraVideoFill } from "react-icons/bs";
 import { BiText } from "react-icons/bi";
 import { baseURL } from "../api";
 
@@ -18,6 +18,11 @@ import Stack from "@mui/material/Stack";
 import Button from "@mui/material/Button";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
+import { useDispatch, useSelector } from "react-redux";
+
+import CircularProgress from "@mui/material/CircularProgress";
+import Box from "@mui/material/Box";
+import { homepageActions } from "../redux/homepage-slice";
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -87,6 +92,9 @@ const products = [
 ];
 
 const ProductsPage = () => {
+  const isLoading = useSelector((state) => state.homepage.isLoading);
+  const dispatch = useDispatch();
+  const contentRef = useRef(null);
   const [search, setSearch] = useState("");
   const [data, setData] = useState(products);
   const [upload, setUpload] = useState(false);
@@ -100,7 +108,6 @@ const ProductsPage = () => {
   const [title, setTitle] = useState(null);
   const [description, setDescription] = useState(null);
   const [author, setAuthor] = useState([]);
-  const [authorTemp, setAuthorTemp] = useState("");
 
   const [num, setNum] = useState(1);
   const [authorNum, setAuthorNum] = useState([1]);
@@ -108,6 +115,7 @@ const ProductsPage = () => {
   const [addPdf, setAddPdf] = useState(false);
   const [addImage, setAddImage] = useState(false);
   const [addText, setAddText] = useState(false);
+  const [addVideo, setAddVideo] = useState(false);
 
   const [categoryData, setCategoryData] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState(null);
@@ -119,6 +127,10 @@ const ProductsPage = () => {
   const [formFillUpError, setFormFillUpError] = useState(false);
   const [submittedPopUp, setSubmittedPopUp] = useState(false);
   const [submitMsg, setSubmitMsg] = useState("");
+
+  const [titleError, setTitleError] = useState(false);
+  const [desError, setDesError] = useState(false);
+  const [authorError, setAuthorError] = useState(false);
 
   useEffect(() => {
     const result = products.filter((data) =>
@@ -185,21 +197,39 @@ const ProductsPage = () => {
   };
 
   const pdfUploadSec = () => {
+    clearContentHandler();
     setAddPdf(true);
     setAddImage(false);
     setAddText(false);
+    setAddVideo(false);
+    contentRef.current.scrollIntoView({ behavior: "smooth" });
   };
 
   const imageUploadSec = () => {
+    clearContentHandler();
     setAddPdf(false);
     setAddImage(true);
     setAddText(false);
+    setAddVideo(false);
+    contentRef.current.scrollIntoView({ behavior: "smooth" });
   };
 
   const textUploadSec = () => {
+    clearContentHandler();
     setAddPdf(false);
     setAddImage(false);
     setAddText(true);
+    setAddVideo(false);
+    contentRef.current.scrollIntoView({ behavior: "smooth" });
+  };
+
+  const videoUploadSec = () => {
+    clearContentHandler();
+    setAddPdf(false);
+    setAddImage(false);
+    setAddText(false);
+    setAddVideo(true);
+    contentRef.current.scrollIntoView({ behavior: "smooth" });
   };
 
   const columns = [
@@ -338,6 +368,7 @@ const ProductsPage = () => {
       selectedSubCategory &&
       selectedGenre
     ) {
+      dispatch(homepageActions.setIsLoading(true));
       const data = {
         title: title,
         category_id: selectedCategory,
@@ -398,9 +429,17 @@ const ProductsPage = () => {
         console.log("Error");
       }
     } else {
-      console.log("Please fill out the form!");
       setFormFillUpError(true);
+
+      if (!title) setTitleError(true);
+      if (!description) setDesError(true);
+      if (author.length === 0) setAuthorError(true);
+
+      if (title) setTitleError(false);
+      if (description) setDesError(false);
+      if (author.length !== 0) setAuthorError(false);
     }
+    dispatch(homepageActions.setIsLoading(false));
   };
 
   const goBackHandler = () => {
@@ -411,9 +450,19 @@ const ProductsPage = () => {
     setTitle(null);
     setDescription(null);
     setAuthor([]);
-    setAuthorTemp("");
+    setImage(null);
+
+    setTitleError(false);
+    setDesError(false);
+    setAuthorError(false);
 
     setUpload(false);
+  };
+
+  const clearContentHandler = () => {
+    setPdfFile(null);
+    setTextContent("");
+    setImage(null);
   };
 
   return (
@@ -442,16 +491,28 @@ const ProductsPage = () => {
             <p className={styles.options}>Contact</p>
           </Link>
 
-          <Link className={styles.link} to="/dashboard/products">
-            <p className={styles.active}>Products</p>
+          <Link className={styles.link} to="/dashboard/contents">
+            <p className={styles.active}>Contents</p>
           </Link>
         </div>
       </div>
 
+      {isLoading && (
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            marginTop: "50px",
+          }}
+        >
+          <CircularProgress color="inherit" />
+        </Box>
+      )}
+
       <div className={classes.rightCon}>
         {!upload && (
           <div className={classes.rContainer}>
-            <p className={classes.pTitle}>Products</p>
+            <p className={classes.pTitle}>Contents</p>
 
             <div className={classes.filterContainer}>
               <select className={classes.filterOp} name="filter">
@@ -564,7 +625,7 @@ const ProductsPage = () => {
 
             <div className={classes.addPForm}>
               <div>
-                <p className={classes.formTitle}>Title</p>
+                <p className={classes.formTitle}>Title*</p>
                 <input
                   className={classes.inputText}
                   type="text"
@@ -572,15 +633,21 @@ const ProductsPage = () => {
                     setTitle(e.target.value);
                   }}
                 />
+                {titleError && (
+                  <p className={classes.errorTxt}>Please add a title!</p>
+                )}
               </div>
               <div>
-                <p className={classes.formTitle}>Description</p>
+                <p className={classes.formTitle}>Description*</p>
                 <textarea
                   className={classes.ayInput}
                   onChange={(e) => {
                     setDescription(e.target.value);
                   }}
                 />
+                {desError && (
+                  <p className={classes.errorTxt}>Please add a description!</p>
+                )}
               </div>
               <div className={classes.nameCon}>
                 {/* <div className={classes.lanSelectCon}>
@@ -617,6 +684,9 @@ const ProductsPage = () => {
                   alt=""
                   onClick={authorHandler}
                 />
+                {authorError && (
+                  <p className={classes.errorTxt}>Please add an author!</p>
+                )}
               </div>
               <div className={classes.uploadContentCon}>
                 <p className={classes.ucTitle}>Upload your content</p>
@@ -630,109 +700,119 @@ const ProductsPage = () => {
                     onClick={imageUploadSec}
                   />
                   <BiText className={classes.docLogo} onClick={textUploadSec} />
-                </div>
-              </div>
-              {addText && (
-                <div>
-                  <p className={classes.formTitle}>Content</p>
-                  {/* <textarea className={classes.contentInput} /> */}
-                  <Editor
-                    onInit={(evt, editor) => (editorRef.current = editor)}
-                    initialValue=""
-                    init={{
-                      height: 500,
-                      menubar: false,
-                      plugins: [
-                        "advlist autolink lists link image charmap print preview anchor",
-                        "searchreplace visualblocks code fullscreen",
-                        "insertdatetime media table paste code help wordcount",
-                      ],
-                      toolbar:
-                        "undo redo | formatselect | " +
-                        "bold italic backcolor | alignleft aligncenter " +
-                        "alignright alignjustify | bullist numlist outdent indent | " +
-                        "removeformat | help",
-                      content_style:
-                        "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
-                    }}
+                  <BsCameraVideoFill
+                    className={classes.docLogo}
+                    onClick={videoUploadSec}
                   />
                 </div>
-              )}
-              {addImage && (
-                <div>
-                  <p className={classes.formTitle}>Content</p>
-                  {image === null && (
+              </div>
+
+              <div ref={contentRef}>
+                {addText && (
+                  <div>
+                    <p className={classes.formTitle}>Content</p>
+                    {/* <textarea className={classes.contentInput} /> */}
+                    <Editor
+                      onInit={(evt, editor) => (editorRef.current = editor)}
+                      initialValue=""
+                      init={{
+                        height: 500,
+                        menubar: false,
+                        plugins: [
+                          "advlist autolink lists link image charmap print preview anchor",
+                          "searchreplace visualblocks code fullscreen",
+                          "insertdatetime media table paste code help wordcount",
+                        ],
+                        toolbar:
+                          "undo redo | formatselect | " +
+                          "bold italic backcolor | alignleft aligncenter " +
+                          "alignright alignjustify | bullist numlist outdent indent | " +
+                          "removeformat | help",
+                        content_style:
+                          "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
+                      }}
+                    />
+                  </div>
+                )}
+                {addImage && (
+                  <div>
+                    <p className={classes.formTitle}>Content</p>
+                    {image === null && (
+                      <div
+                        className={classes.uploadImg}
+                        onClick={() =>
+                          document.querySelector(".input_img").click()
+                        }
+                      >
+                        <p>Upload Image</p>
+                      </div>
+                    )}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="input_img"
+                      hidden
+                      onChange={handleImageChange}
+                    />
+                    {image &&
+                      image.map((item, i) => (
+                        <div className={classes.imagePrevCon}>
+                          <img
+                            key={i}
+                            className={classes.previewImg}
+                            src={item}
+                            id={`contentRem${i}`}
+                            onClick={(e) => {
+                              const selectedImg = image.filter(
+                                (item) => item !== e.target.src
+                              );
+                              setImage(selectedImg);
+                            }}
+                          />
+                          <p
+                            className={classes.imagePrevRem}
+                            onClick={() => {
+                              document.querySelector(`#contentRem${i}`).click();
+                            }}
+                          >
+                            Click to Remove
+                          </p>
+                        </div>
+                      ))}
+                    {addImg && (
+                      <img
+                        className={classes.addimgBtn}
+                        src={addBtn2}
+                        alt=""
+                        onClick={() =>
+                          document.querySelector(".input_img").click()
+                        }
+                      />
+                    )}
+                  </div>
+                )}
+                {addPdf && (
+                  <div className={classes.addPDF}>
+                    <p className={classes.formTitle}>Content</p>
                     <div
                       className={classes.uploadImg}
                       onClick={() =>
-                        document.querySelector(".input_img").click()
+                        document.querySelector(".input_pdf").click()
                       }
                     >
-                      <p>Upload Image</p>
+                      <p>Upload PDF</p>
                     </div>
-                  )}
-                  <input
-                    type="file"
-                    accept="image/*"
-                    className="input_img"
-                    hidden
-                    onChange={handleImageChange}
-                  />
-                  {image &&
-                    image.map((item, i) => (
-                      <div className={classes.imagePrevCon}>
-                        <img
-                          key={i}
-                          className={classes.previewImg}
-                          src={item}
-                          id={`contentRem${i}`}
-                          onClick={(e) => {
-                            const selectedImg = image.filter(
-                              (item) => item !== e.target.src
-                            );
-                            setImage(selectedImg);
-                          }}
-                        />
-                        <p
-                          className={classes.imagePrevRem}
-                          onClick={() => {
-                            document.querySelector(`#contentRem${i}`).click();
-                          }}
-                        >
-                          Click to Remove
-                        </p>
-                      </div>
-                    ))}
-                  {addImg && (
-                    <img
-                      className={classes.addimgBtn}
-                      src={addBtn2}
-                      alt=""
-                      onClick={() =>
-                        document.querySelector(".input_img").click()
-                      }
+                    <input
+                      className="input_pdf"
+                      type="file"
+                      accept="application/pdf"
+                      hidden
+                      onChange={handlePDFInputChange}
                     />
-                  )}
-                </div>
-              )}
-              {addPdf && (
-                <div className={classes.addPDF}>
-                  <p className={classes.formTitle}>Content</p>
-                  <div
-                    className={classes.uploadImg}
-                    onClick={() => document.querySelector(".input_pdf").click()}
-                  >
-                    <p>Upload PDF</p>
                   </div>
-                  <input
-                    className="input_pdf"
-                    type="file"
-                    accept="application/pdf"
-                    hidden
-                    onChange={handlePDFInputChange}
-                  />
-                </div>
-              )}
+                )}
+                {addVideo && <div>Add video</div>}
+              </div>
               <div className={classes.TBSec}>
                 <p className={classes.formTitle}>Thumbnail and Banner</p>
                 {!thumbImg && (

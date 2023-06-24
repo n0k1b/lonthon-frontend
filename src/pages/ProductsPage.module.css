@@ -146,6 +146,7 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
+  margin-top: 30px;
 }
 
 .ucTitle {
@@ -214,4 +215,9 @@
   margin-right: 10px;
   margin-top: 10px;
   cursor: pointer;
+}
+
+.errorTxt {
+  font-size: 12px;
+  color: red;
 }
