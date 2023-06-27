@@ -49,7 +49,7 @@ const LongCard = ({ data }) => {
               )}
             </div> */}
 
-            <Link className={styles.link} to={`/product/${data.id}`}>
+            <Link className={styles.link} to={`/content/${data.id}`}>
               <GreyBtn>Read More</GreyBtn>
             </Link>
           </div>

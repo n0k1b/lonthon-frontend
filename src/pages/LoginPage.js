@@ -8,6 +8,9 @@ import Box from "@mui/material/Box";
 
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
+import { useNavigate } from "react-router-dom";
+import { useDispatch } from "react-redux";
+import { homepageActions } from "../redux/homepage-slice";
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
@@ -25,6 +28,9 @@ const LoginPage = () => {
   const [errorMsg, setErrorMsg] = useState(false);
   const [success, setSuccess] = useState(false);
   const [successMsg, setSuccessMsg] = useState(false);
+
+  const navigate = useNavigate();
+  const dispatch = useDispatch();
 
   const loginHandler = async () => {
     if (!email) setEmailError(true);
@@ -66,6 +72,19 @@ const LoginPage = () => {
       } else {
         setSuccess(true);
         setSuccessMsg(data.message);
+
+        dispatch(homepageActions.setToken(data.data.token));
+        dispatch(homepageActions.setIsLoggedIn(true));
+        dispatch(homepageActions.setUserData(data.data.user));
+
+        if (data.data.user && data.data.token) {
+          localStorage.setItem("tokenLonthon", data.data.token);
+          localStorage.setItem("userDataLonthon", data.data.user);
+        }
+
+        setTimeout(() => {
+          navigate("/");
+        }, 2000);
       }
       setIsLoading(false);
     }
@@ -155,6 +174,7 @@ const LoginPage = () => {
             display: "flex",
             justifyContent: "center",
             marginTop: "50px",
+            marginBottom: "500px",
           }}
         >
           <CircularProgress color="inherit" />

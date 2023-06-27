@@ -7,8 +7,13 @@ import { useState, useRef } from "react";
 import { Link } from "react-router-dom";
 import styled from "@emotion/styled";
 import { FiMenu } from "react-icons/fi";
+import { useDispatch, useSelector } from "react-redux";
+import { homepageActions } from "../../redux/homepage-slice";
 
 const Navbar = ({ menuItems }) => {
+  const dispatch = useDispatch();
+  const isLoggedIn = useSelector((state) => state.homepage.isLoggedIn);
+
   // const [litDDOpen, setLitDDOpen] = useState(false);
   // const [mcDDOpen, setMcDDOpen] = useState(false);
   // const [aeDDOpen, setAeDDOpen] = useState(false);
@@ -57,6 +62,14 @@ const Navbar = ({ menuItems }) => {
       setDropdownStates(menuItems.map((menu) => false));
     }
   }, [menuItems]);
+
+  const logoutHandler = () => {
+    dispatch(homepageActions.setIsLoggedIn(false));
+    dispatch(homepageActions.setToken(""));
+    dispatch(homepageActions.setUserData({}));
+    localStorage.removeItem("tokenLonthon");
+    localStorage.removeItem("userDataLonthon");
+  };
 
   return (
     <Wrapper menuSize={menuItems.length}>
@@ -107,6 +120,23 @@ const Navbar = ({ menuItems }) => {
               </>
             ))}
           </div>
+
+          {!isLoggedIn && (
+            <>
+              <Link className={styles.link} to="/login">
+                <p className={styles.nav_link}>LOGIN</p>
+              </Link>
+              <Link className={styles.link} to="/signup">
+                <GreyBtn>SIGNUP</GreyBtn>
+              </Link>
+            </>
+          )}
+
+          {isLoggedIn && (
+            <div onClick={logoutHandler}>
+              <GreyBtn>LOGOUT</GreyBtn>
+            </div>
+          )}
           {/* Add expanded class to toggle menu mobile view */}
           {/* <div className={`${styles.links} mobile-links`} ref={toggleMenu}>
             <Link to="/" className={styles.link}>

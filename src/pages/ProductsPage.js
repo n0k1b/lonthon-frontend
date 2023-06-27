@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import styles from "./DashboardPage.module.css";
 import classes from "./ProductsPage.module.css";
 import dp from "../image/dp.jpg";
-import { Link } from "react-router-dom";
+import { Link, Navigate } from "react-router-dom";
 import DataTable from "react-data-table-component";
 import GreyBtn from "../components/UI/GreyBtn";
 import addBtn from "../image/addBtn.png";
@@ -28,75 +28,14 @@ const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
-const products = [
-  {
-    id: 0,
-    name: "Product1",
-    price: 100,
-  },
-  {
-    id: 1,
-    name: "Product2",
-    price: 100,
-  },
-  {
-    id: 2,
-    name: "Product3",
-    price: 100,
-  },
-  {
-    id: 4,
-    name: "Product1",
-    price: 100,
-  },
-  {
-    id: 5,
-    name: "Product2",
-    price: 100,
-  },
-  {
-    id: 6,
-    name: "Product3",
-    price: 100,
-  },
-  {
-    id: 7,
-    name: "Product1",
-    price: 100,
-  },
-  {
-    id: 8,
-    name: "Product2",
-    price: 100,
-  },
-  {
-    id: 9,
-    name: "Product3",
-    price: 100,
-  },
-  {
-    id: 10,
-    name: "Product1",
-    price: 100,
-  },
-  {
-    id: 11,
-    name: "Product2",
-    price: 100,
-  },
-  {
-    id: 12,
-    name: "Product3",
-    price: 100,
-  },
-];
-
 const ProductsPage = () => {
   const isLoading = useSelector((state) => state.homepage.isLoading);
+  const isLoggedIn = useSelector((state) => state.homepage.isLoggedIn);
+  const token = useSelector((state) => state.homepage.token);
   const dispatch = useDispatch();
   const contentRef = useRef(null);
   const [search, setSearch] = useState("");
-  const [data, setData] = useState(products);
+  const [data, setData] = useState();
   const [upload, setUpload] = useState(false);
   const [image, setImage] = useState(null);
   const [addImg, setAddImg] = useState(false);
@@ -132,11 +71,16 @@ const ProductsPage = () => {
   const [desError, setDesError] = useState(false);
   const [authorError, setAuthorError] = useState(false);
 
+  const [loading, setLoading] = useState(false);
+  const [dashboardData, setDashboardData] = useState();
+
   useEffect(() => {
-    const result = products.filter((data) =>
-      data.name.toLocaleLowerCase().match(search.toLocaleLowerCase())
-    );
-    setData(result);
+    if (dashboardData) {
+      const result = dashboardData.contents.filter((data) =>
+        data.title.toLocaleLowerCase().match(search.toLocaleLowerCase())
+      );
+      setData(result);
+    }
   }, [search]);
 
   useEffect(() => {
@@ -234,20 +178,28 @@ const ProductsPage = () => {
 
   const columns = [
     {
-      name: "Product ID",
+      name: "Content ID",
       selector: (row) => row.id,
     },
     {
-      name: "Name",
-      selector: (row) => row.name,
+      name: "Title",
+      selector: (row) => row.title,
     },
     {
       name: "Price",
-      selector: (row) => row.price,
+      selector: (row) => (row.price ? row.price : 0),
     },
     {
-      name: "Action",
-      cell: (row) => <GreyBtn>Details</GreyBtn>,
+      name: "Author",
+      selector: (row) => row.author,
+    },
+    {
+      name: "",
+      cell: (row) => (
+        <Link to={`/content/${row.id}`}>
+          <GreyBtn>Details</GreyBtn>
+        </Link>
+      ),
     },
   ];
 
@@ -344,6 +296,35 @@ const ProductsPage = () => {
   useEffect(() => {
     genreFetch();
   }, [selectedSubCategory]);
+
+  const dashboardDataFetch = async () => {
+    setLoading(true);
+    const response = await fetch(`${baseURL}/dashboard`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+    console.log(response);
+
+    if (!response.ok) {
+      setLoading(false);
+      return;
+    }
+
+    const data = await response.json();
+    console.log(data.data);
+    setDashboardData(data.data);
+    setData(data.data.contents);
+    setLoading(false);
+  };
+
+  useEffect(() => {
+    if (isLoggedIn) {
+      dashboardDataFetch();
+    }
+  }, [isLoggedIn]);
 
   //Post Data
   const postDataHandler = async () => {
@@ -466,191 +447,206 @@ const ProductsPage = () => {
   };
 
   return (
-    <div className={styles.container}>
-      <div className={styles.leftCon}>
-        <div className={styles.authorCon}>
-          <div className={styles.authorSec}>
-            <img className={styles.dp} src={dp} alt="author_dp" />
+    <>
+      {!isLoggedIn && <Navigate to="/login" />}
 
-            <div>
-              <p className={styles.name}>Ashraful Hauqe</p>
-              <p className={styles.role}>Content Writter</p>
+      {isLoggedIn && !loading && dashboardData && (
+        <div className={styles.container}>
+          <div className={styles.leftCon}>
+            <div className={styles.authorCon}>
+              <div className={styles.authorSec}>
+                <img className={styles.dp} src={dp} alt="author_dp" />
+
+                <div>
+                  <p className={styles.name}>
+                    {dashboardData.user.first_name}{" "}
+                    {dashboardData.user.last_name}
+                  </p>
+                  <p className={styles.role}>{dashboardData.user.role}</p>
+                </div>
+              </div>
+              <Link className={styles.link} to="/dashboard/edit_profile">
+                <div className={styles.btn}>Edit Profile</div>
+              </Link>
+            </div>
+
+            <div className={styles.optionsCon}>
+              <Link className={styles.link} to="/dashboard">
+                <p className={styles.options}>Dashboard</p>
+              </Link>
+
+              <Link className={styles.link} to="/dashboard/contact">
+                <p className={styles.options}>Contact</p>
+              </Link>
+
+              <Link className={styles.link} to="/dashboard/contents">
+                <p className={styles.active}>Contents</p>
+              </Link>
             </div>
           </div>
-          <Link className={styles.link} to="/dashboard/edit_profile">
-            <div className={styles.btn}>Edit Profile</div>
-          </Link>
-        </div>
 
-        <div className={styles.optionsCon}>
-          <Link className={styles.link} to="/dashboard">
-            <p className={styles.options}>Dashboard</p>
-          </Link>
+          {isLoading && (
+            <Box
+              sx={{
+                display: "flex",
+                justifyContent: "center",
+                marginTop: "50px",
+              }}
+            >
+              <CircularProgress color="inherit" />
+            </Box>
+          )}
 
-          <Link className={styles.link} to="/dashboard/contact">
-            <p className={styles.options}>Contact</p>
-          </Link>
+          <div className={classes.rightCon}>
+            {!upload && (
+              <div className={classes.rContainer}>
+                <p className={classes.pTitle}>Contents</p>
 
-          <Link className={styles.link} to="/dashboard/contents">
-            <p className={styles.active}>Contents</p>
-          </Link>
-        </div>
-      </div>
+                <div className={classes.filterContainer}>
+                  <select className={classes.filterOp} name="filter">
+                    <option value="" disabled selected>
+                      Select Category
+                    </option>
+                    <option value="novels">Novels</option>
+                    <option value="poems">Poems</option>
+                    <option value="others">Others</option>
+                  </select>
 
-      {isLoading && (
-        <Box
-          sx={{
-            display: "flex",
-            justifyContent: "center",
-            marginTop: "50px",
-          }}
-        >
-          <CircularProgress color="inherit" />
-        </Box>
-      )}
+                  <select className={classes.filterOp} name="filter">
+                    <option value="" disabled selected>
+                      Select Sub Category
+                    </option>
+                    <option value="novels">Novels</option>
+                    <option value="poems">Poems</option>
+                    <option value="others">Others</option>
+                  </select>
 
-      <div className={classes.rightCon}>
-        {!upload && (
-          <div className={classes.rContainer}>
-            <p className={classes.pTitle}>Contents</p>
+                  <select className={classes.filterOp} name="filter">
+                    <option value="" disabled selected>
+                      Genre
+                    </option>
+                    <option value="novels">Novels</option>
+                    <option value="poems">Poems</option>
+                    <option value="others">Others</option>
+                  </select>
+                </div>
 
-            <div className={classes.filterContainer}>
-              <select className={classes.filterOp} name="filter">
-                <option value="" disabled selected>
-                  Select Category
-                </option>
-                <option value="novels">Novels</option>
-                <option value="poems">Poems</option>
-                <option value="others">Others</option>
-              </select>
+                <img
+                  src={addBtn}
+                  className={classes.addBtn}
+                  onClick={uploadHandler}
+                />
 
-              <select className={classes.filterOp} name="filter">
-                <option value="" disabled selected>
-                  Select Sub Category
-                </option>
-                <option value="novels">Novels</option>
-                <option value="poems">Poems</option>
-                <option value="others">Others</option>
-              </select>
-
-              <select className={classes.filterOp} name="filter">
-                <option value="" disabled selected>
-                  Genre
-                </option>
-                <option value="novels">Novels</option>
-                <option value="poems">Poems</option>
-                <option value="others">Others</option>
-              </select>
-            </div>
-
-            <img
-              src={addBtn}
-              className={classes.addBtn}
-              onClick={uploadHandler}
-            />
-
-            <div className={classes.tableCon}>
-              <DataTable
-                data={data}
-                columns={columns}
-                pagination
-                fixedHeader
-                fixedHeaderScrollHeight="500px"
-                highlightOnHover
-                subHeader
-                subHeaderComponent={
-                  <input
-                    type="text"
-                    placeholder="Search"
-                    className={classes.tableSearch}
-                    onChange={(e) => setSearch(e.target.value)}
+                <div className={classes.tableCon}>
+                  <DataTable
+                    data={data}
+                    columns={columns}
+                    pagination
+                    fixedHeader
+                    fixedHeaderScrollHeight="500px"
+                    highlightOnHover
+                    subHeader
+                    subHeaderComponent={
+                      <input
+                        type="text"
+                        placeholder="Search"
+                        className={classes.tableSearch}
+                        onChange={(e) => setSearch(e.target.value)}
+                      />
+                    }
                   />
-                }
-              />
-            </div>
-          </div>
-        )}
-
-        {upload && (
-          <div className={classes.uploadSection}>
-            <p className={classes.back} onClick={goBackHandler}>
-              Go back
-            </p>
-            <p className={classes.pTitle}>Producte Upload</p>
-
-            <div className={classes.filterContainer}>
-              <select
-                className={classes.filterOp}
-                name="filter"
-                onChange={handleCatSelect}
-              >
-                <option value="" disabled selected>
-                  Select Category
-                </option>
-                {categoryData.map((op) => (
-                  <option value={op.id}>{op.name}</option>
-                ))}
-              </select>
-
-              {selectedCategory && (
-                <select
-                  className={classes.filterOp}
-                  name="filter"
-                  onChange={handleSubCatSelect}
-                >
-                  <option value="" disabled selected>
-                    Select Sub Category
-                  </option>
-                  {subcategoryData.map((op) => (
-                    <option value={op.id}>{op.name}</option>
-                  ))}
-                </select>
-              )}
-
-              {selectedSubCategory && (
-                <select
-                  className={classes.filterOp}
-                  name="filter"
-                  onClick={handleGenreSelect}
-                >
-                  <option value="" disabled selected>
-                    Genre
-                  </option>
-                  {genreData.map((op) => (
-                    <option value={op.id}>{op.name}</option>
-                  ))}
-                </select>
-              )}
-            </div>
-
-            <div className={classes.addPForm}>
-              <div>
-                <p className={classes.formTitle}>Title*</p>
-                <input
-                  className={classes.inputText}
-                  type="text"
-                  onChange={(e) => {
-                    setTitle(e.target.value);
-                  }}
-                />
-                {titleError && (
-                  <p className={classes.errorTxt}>Please add a title!</p>
-                )}
+                </div>
               </div>
-              <div>
-                <p className={classes.formTitle}>Description*</p>
-                <textarea
-                  className={classes.ayInput}
-                  onChange={(e) => {
-                    setDescription(e.target.value);
-                  }}
-                />
-                {desError && (
-                  <p className={classes.errorTxt}>Please add a description!</p>
-                )}
-              </div>
-              <div className={classes.nameCon}>
-                {/* <div className={classes.lanSelectCon}>
+            )}
+
+            {upload && (
+              <div className={classes.uploadSection}>
+                <p className={classes.back} onClick={goBackHandler}>
+                  Go back
+                </p>
+                <p className={classes.pTitle}>Producte Upload</p>
+
+                <div className={classes.filterContainer}>
+                  <select
+                    className={classes.filterOp}
+                    name="filter"
+                    onChange={handleCatSelect}
+                  >
+                    <option value="" disabled selected>
+                      Select Category
+                    </option>
+                    {categoryData.map((op, i) => (
+                      <option key={i} value={op.id}>
+                        {op.name}
+                      </option>
+                    ))}
+                  </select>
+
+                  {selectedCategory && (
+                    <select
+                      className={classes.filterOp}
+                      name="filter"
+                      onChange={handleSubCatSelect}
+                    >
+                      <option value="" disabled selected>
+                        Select Sub Category
+                      </option>
+                      {subcategoryData.map((op, i) => (
+                        <option key={i} value={op.id}>
+                          {op.name}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+
+                  {selectedSubCategory && (
+                    <select
+                      className={classes.filterOp}
+                      name="filter"
+                      onClick={handleGenreSelect}
+                    >
+                      <option value="" disabled selected>
+                        Genre
+                      </option>
+                      {genreData.map((op, i) => (
+                        <option key={i} value={op.id}>
+                          {op.name}
+                        </option>
+                      ))}
+                    </select>
+                  )}
+                </div>
+
+                <div className={classes.addPForm}>
+                  <div>
+                    <p className={classes.formTitle}>Title*</p>
+                    <input
+                      className={classes.inputText}
+                      type="text"
+                      onChange={(e) => {
+                        setTitle(e.target.value);
+                      }}
+                    />
+                    {titleError && (
+                      <p className={classes.errorTxt}>Please add a title!</p>
+                    )}
+                  </div>
+                  <div>
+                    <p className={classes.formTitle}>Description*</p>
+                    <textarea
+                      className={classes.ayInput}
+                      onChange={(e) => {
+                        setDescription(e.target.value);
+                      }}
+                    />
+                    {desError && (
+                      <p className={classes.errorTxt}>
+                        Please add a description!
+                      </p>
+                    )}
+                  </div>
+                  <div className={classes.nameCon}>
+                    {/* <div className={classes.lanSelectCon}>
                   <p className={classes.formTitle}>Language</p>
 
                   <select className={classes.filterOpUp} name="filter">
@@ -662,266 +658,289 @@ const ProductsPage = () => {
                     <option value="others">Others</option>
                   </select>
                 </div> */}
-              </div>
-              <div className={classes.authorNameSec}>
-                {authorNum.map((num, index) => (
-                  <div key={index}>
-                    <p className={classes.formTitle}>Author Name {num}</p>
-                    <input
-                      className={classes.inputText}
-                      type="text"
-                      onChange={(e) => {
-                        const updatedAuthors = [...author];
-                        updatedAuthors[index] = e.target.value;
-                        setAuthor(updatedAuthors);
-                      }}
-                    />
                   </div>
-                ))}
-                <img
-                  className={classes.addimgBtn}
-                  src={addBtn2}
-                  alt=""
-                  onClick={authorHandler}
-                />
-                {authorError && (
-                  <p className={classes.errorTxt}>Please add an author!</p>
-                )}
-              </div>
-              <div className={classes.uploadContentCon}>
-                <p className={classes.ucTitle}>Upload your content</p>
-                <div>
-                  <BsFiletypePdf
-                    className={classes.docLogo}
-                    onClick={pdfUploadSec}
-                  />
-                  <BsImage
-                    className={classes.docLogo}
-                    onClick={imageUploadSec}
-                  />
-                  <BiText className={classes.docLogo} onClick={textUploadSec} />
-                  <BsCameraVideoFill
-                    className={classes.docLogo}
-                    onClick={videoUploadSec}
-                  />
-                </div>
-              </div>
+                  <div className={classes.authorNameSec}>
+                    {authorNum.map((num, index) => (
+                      <div key={index}>
+                        <p className={classes.formTitle}>Author Name {num}</p>
+                        <input
+                          className={classes.inputText}
+                          type="text"
+                          onChange={(e) => {
+                            const updatedAuthors = [...author];
+                            updatedAuthors[index] = e.target.value;
+                            setAuthor(updatedAuthors);
+                          }}
+                        />
+                      </div>
+                    ))}
+                    <img
+                      className={classes.addimgBtn}
+                      src={addBtn2}
+                      alt=""
+                      onClick={authorHandler}
+                    />
+                    {authorError && (
+                      <p className={classes.errorTxt}>Please add an author!</p>
+                    )}
+                  </div>
+                  <div className={classes.uploadContentCon}>
+                    <p className={classes.ucTitle}>Upload your content</p>
+                    <div>
+                      <BsFiletypePdf
+                        className={classes.docLogo}
+                        onClick={pdfUploadSec}
+                      />
+                      <BsImage
+                        className={classes.docLogo}
+                        onClick={imageUploadSec}
+                      />
+                      <BiText
+                        className={classes.docLogo}
+                        onClick={textUploadSec}
+                      />
+                      <BsCameraVideoFill
+                        className={classes.docLogo}
+                        onClick={videoUploadSec}
+                      />
+                    </div>
+                  </div>
 
-              <div ref={contentRef}>
-                {addText && (
-                  <div>
-                    <p className={classes.formTitle}>Content</p>
-                    {/* <textarea className={classes.contentInput} /> */}
-                    <Editor
-                      onInit={(evt, editor) => (editorRef.current = editor)}
-                      initialValue=""
-                      init={{
-                        height: 500,
-                        menubar: false,
-                        plugins: [
-                          "advlist autolink lists link image charmap print preview anchor",
-                          "searchreplace visualblocks code fullscreen",
-                          "insertdatetime media table paste code help wordcount",
-                        ],
-                        toolbar:
-                          "undo redo | formatselect | " +
-                          "bold italic backcolor | alignleft aligncenter " +
-                          "alignright alignjustify | bullist numlist outdent indent | " +
-                          "removeformat | help",
-                        content_style:
-                          "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
-                      }}
-                    />
+                  <div ref={contentRef}>
+                    {addText && (
+                      <div>
+                        <p className={classes.formTitle}>Content</p>
+                        {/* <textarea className={classes.contentInput} /> */}
+                        <Editor
+                          onInit={(evt, editor) => (editorRef.current = editor)}
+                          initialValue=""
+                          init={{
+                            height: 500,
+                            menubar: false,
+                            plugins: [
+                              "advlist autolink lists link image charmap print preview anchor",
+                              "searchreplace visualblocks code fullscreen",
+                              "insertdatetime media table paste code help wordcount",
+                            ],
+                            toolbar:
+                              "undo redo | formatselect | " +
+                              "bold italic backcolor | alignleft aligncenter " +
+                              "alignright alignjustify | bullist numlist outdent indent | " +
+                              "removeformat | help",
+                            content_style:
+                              "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
+                          }}
+                        />
+                      </div>
+                    )}
+                    {addImage && (
+                      <div>
+                        <p className={classes.formTitle}>Content</p>
+                        {image === null && (
+                          <div
+                            className={classes.uploadImg}
+                            onClick={() =>
+                              document.querySelector(".input_img").click()
+                            }
+                          >
+                            <p>Upload Image</p>
+                          </div>
+                        )}
+                        <input
+                          type="file"
+                          accept="image/*"
+                          className="input_img"
+                          hidden
+                          onChange={handleImageChange}
+                        />
+                        {image &&
+                          image.map((item, i) => (
+                            <div key={i} className={classes.imagePrevCon}>
+                              <img
+                                className={classes.previewImg}
+                                src={item}
+                                id={`contentRem${i}`}
+                                onClick={(e) => {
+                                  const selectedImg = image.filter(
+                                    (item) => item !== e.target.src
+                                  );
+                                  setImage(selectedImg);
+                                }}
+                              />
+                              <p
+                                className={classes.imagePrevRem}
+                                onClick={() => {
+                                  document
+                                    .querySelector(`#contentRem${i}`)
+                                    .click();
+                                }}
+                              >
+                                Click to Remove
+                              </p>
+                            </div>
+                          ))}
+                        {addImg && (
+                          <img
+                            className={classes.addimgBtn}
+                            src={addBtn2}
+                            alt=""
+                            onClick={() =>
+                              document.querySelector(".input_img").click()
+                            }
+                          />
+                        )}
+                      </div>
+                    )}
+                    {addPdf && (
+                      <div className={classes.addPDF}>
+                        <p className={classes.formTitle}>Content</p>
+                        <div
+                          className={classes.uploadImg}
+                          onClick={() =>
+                            document.querySelector(".input_pdf").click()
+                          }
+                        >
+                          <p>Upload PDF</p>
+                        </div>
+                        <input
+                          className="input_pdf"
+                          type="file"
+                          accept="application/pdf"
+                          hidden
+                          onChange={handlePDFInputChange}
+                        />
+                      </div>
+                    )}
+                    {addVideo && <div>Add video</div>}
                   </div>
-                )}
-                {addImage && (
-                  <div>
-                    <p className={classes.formTitle}>Content</p>
-                    {image === null && (
+                  <div className={classes.TBSec}>
+                    <p className={classes.formTitle}>Thumbnail and Banner</p>
+                    {!thumbImg && (
                       <div
                         className={classes.uploadImg}
                         onClick={() =>
-                          document.querySelector(".input_img").click()
+                          document.querySelector(".input_thumbImg").click()
                         }
                       >
-                        <p>Upload Image</p>
+                        <p>Upload Thumbnail Image</p>
                       </div>
                     )}
                     <input
                       type="file"
                       accept="image/*"
-                      className="input_img"
+                      className="input_thumbImg"
                       hidden
-                      onChange={handleImageChange}
+                      onChange={handleImageChangeThumb}
                     />
-                    {image &&
-                      image.map((item, i) => (
-                        <div className={classes.imagePrevCon}>
-                          <img
-                            key={i}
-                            className={classes.previewImg}
-                            src={item}
-                            id={`contentRem${i}`}
-                            onClick={(e) => {
-                              const selectedImg = image.filter(
-                                (item) => item !== e.target.src
-                              );
-                              setImage(selectedImg);
-                            }}
-                          />
-                          <p
-                            className={classes.imagePrevRem}
-                            onClick={() => {
-                              document.querySelector(`#contentRem${i}`).click();
-                            }}
-                          >
-                            Click to Remove
-                          </p>
-                        </div>
-                      ))}
-                    {addImg && (
-                      <img
-                        className={classes.addimgBtn}
-                        src={addBtn2}
-                        alt=""
+                    {thumbImg && (
+                      <div className={classes.imagePrevCon}>
+                        <img
+                          className={classes.previewImg}
+                          src={thumbImg}
+                          onClick={() => {
+                            setThumbImg(null);
+                          }}
+                          id="thumbImgRem"
+                        />
+                        <p
+                          className={classes.imagePrevRem}
+                          onClick={() => {
+                            document.querySelector("#thumbImgRem").click();
+                          }}
+                        >
+                          Click to Remove
+                        </p>
+                      </div>
+                    )}
+
+                    {!banImg && (
+                      <div
+                        className={classes.uploadImgBan}
                         onClick={() =>
-                          document.querySelector(".input_img").click()
+                          document.querySelector(".input_banImg").click()
                         }
-                      />
+                      >
+                        <p>Upload Banner Image</p>
+                      </div>
+                    )}
+                    <input
+                      type="file"
+                      accept="image/*"
+                      className="input_banImg"
+                      hidden
+                      onChange={handleImageChangeBan}
+                    />
+                    {banImg && (
+                      <div className={classes.imagePrevCon}>
+                        <img
+                          className={classes.previewImg}
+                          src={banImg}
+                          onClick={() => {
+                            setBanImg(null);
+                          }}
+                          id="banImgRem"
+                        />
+                        <p
+                          className={classes.imagePrevRem}
+                          onClick={() => {
+                            document.querySelector("#banImgRem").click();
+                          }}
+                        >
+                          Click to Remove
+                        </p>
+                      </div>
                     )}
                   </div>
-                )}
-                {addPdf && (
-                  <div className={classes.addPDF}>
-                    <p className={classes.formTitle}>Content</p>
-                    <div
-                      className={classes.uploadImg}
-                      onClick={() =>
-                        document.querySelector(".input_pdf").click()
-                      }
-                    >
-                      <p>Upload PDF</p>
-                    </div>
-                    <input
-                      className="input_pdf"
-                      type="file"
-                      accept="application/pdf"
-                      hidden
-                      onChange={handlePDFInputChange}
-                    />
+                  <div className={classes.saveBtn} onClick={log}>
+                    <GreyBtn>Save</GreyBtn>
                   </div>
-                )}
-                {addVideo && <div>Add video</div>}
+                </div>
               </div>
-              <div className={classes.TBSec}>
-                <p className={classes.formTitle}>Thumbnail and Banner</p>
-                {!thumbImg && (
-                  <div
-                    className={classes.uploadImg}
-                    onClick={() =>
-                      document.querySelector(".input_thumbImg").click()
-                    }
-                  >
-                    <p>Upload Thumbnail Image</p>
-                  </div>
-                )}
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="input_thumbImg"
-                  hidden
-                  onChange={handleImageChangeThumb}
-                />
-                {thumbImg && (
-                  <div className={classes.imagePrevCon}>
-                    <img
-                      className={classes.previewImg}
-                      src={thumbImg}
-                      onClick={() => {
-                        setThumbImg(null);
-                      }}
-                      id="thumbImgRem"
-                    />
-                    <p
-                      className={classes.imagePrevRem}
-                      onClick={() => {
-                        document.querySelector("#thumbImgRem").click();
-                      }}
-                    >
-                      Click to Remove
-                    </p>
-                  </div>
-                )}
-
-                {!banImg && (
-                  <div
-                    className={classes.uploadImgBan}
-                    onClick={() =>
-                      document.querySelector(".input_banImg").click()
-                    }
-                  >
-                    <p>Upload Banner Image</p>
-                  </div>
-                )}
-                <input
-                  type="file"
-                  accept="image/*"
-                  className="input_banImg"
-                  hidden
-                  onChange={handleImageChangeBan}
-                />
-                {banImg && (
-                  <div className={classes.imagePrevCon}>
-                    <img
-                      className={classes.previewImg}
-                      src={banImg}
-                      onClick={() => {
-                        setBanImg(null);
-                      }}
-                      id="banImgRem"
-                    />
-                    <p
-                      className={classes.imagePrevRem}
-                      onClick={() => {
-                        document.querySelector("#banImgRem").click();
-                      }}
-                    >
-                      Click to Remove
-                    </p>
-                  </div>
-                )}
-              </div>
-              <div className={classes.saveBtn} onClick={log}>
-                <GreyBtn>Save</GreyBtn>
-              </div>
-            </div>
+            )}
           </div>
-        )}
-      </div>
-      <Snackbar
-        open={formFillUpError}
-        autoHideDuration={6000}
-        onClose={handleClose}
-      >
-        <Alert onClose={handleClose} severity="warning" sx={{ width: "100%" }}>
-          Please fill out the form!
-        </Alert>
-      </Snackbar>
+          <Snackbar
+            open={formFillUpError}
+            autoHideDuration={6000}
+            onClose={handleClose}
+          >
+            <Alert
+              onClose={handleClose}
+              severity="warning"
+              sx={{ width: "100%" }}
+            >
+              Please fill out the form!
+            </Alert>
+          </Snackbar>
 
-      <Snackbar
-        open={submittedPopUp}
-        autoHideDuration={6000}
-        onClose={submitHandleClose}
-      >
-        <Alert
-          onClose={submitHandleClose}
-          severity="success"
-          sx={{ width: "100%" }}
+          <Snackbar
+            open={submittedPopUp}
+            autoHideDuration={6000}
+            onClose={submitHandleClose}
+          >
+            <Alert
+              onClose={submitHandleClose}
+              severity="success"
+              sx={{ width: "100%" }}
+            >
+              {submitMsg}
+            </Alert>
+          </Snackbar>
+        </div>
+      )}
+
+      {loading && (
+        <Box
+          sx={{
+            display: "flex",
+            justifyContent: "center",
+            marginTop: "50px",
+            marginBottom: "500px",
+          }}
         >
-          {submitMsg}
-        </Alert>
-      </Snackbar>
-    </div>
+          <CircularProgress color="inherit" />
+        </Box>
+      )}
+    </>
   );
 };
 export default ProductsPage;

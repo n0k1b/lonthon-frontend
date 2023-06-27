@@ -7,6 +7,7 @@ const initialState = {
   token: "",
   userData: {},
   isLoggedIn: false,
+  dashboardData: {},
 };
 
 export const homepageSlice = createSlice({
@@ -30,6 +31,9 @@ export const homepageSlice = createSlice({
     },
     setIsLoggedIn: (state, action) => {
       state.isLoggedIn = action.payload;
+    },
+    setDashboardData: (state, action) => {
+      state.dashboardData = action.payload;
     },
   },
 });

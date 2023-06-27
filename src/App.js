@@ -43,6 +43,16 @@ function App() {
     setBusSettings(true);
     getContentByCategory();
     // getNavbarMenu();
+
+    const token = localStorage.getItem("tokenLonthon");
+    const userData = localStorage.getItem("userDataLonthon");
+
+    if (token && userData) {
+      dispatch(homepageActions.setIsLoggedIn(true));
+      dispatch(homepageActions.setToken(token));
+      dispatch(homepageActions.setUserData(userData));
+      console.log("logged in");
+    }
   };
 
   const getContentByCategory = async () => {
@@ -122,7 +132,7 @@ function App() {
 
                 <Route path="/dashboard/contents" element={<ProductsPage />} />
 
-                <Route path="/product/:id" element={<ProductDetails />} />
+                <Route path="/content/:id" element={<ProductDetails />} />
 
                 <Route path="/login" element={<LoginPage />} />
 
@@ -158,8 +168,8 @@ const NavbarMenuItems = [
   { label: "OTHERS", url: "/others" },
   { label: "PROMOTIONS", url: "/promotions" },
   { label: "DASHBOARD", url: "/dashboard" },
-  { label: "LOGIN", url: "/login" },
-  { label: "SIGNUP", url: "/signup", isAction: true },
+  // { label: "LOGIN", url: "/login" },
+  // { label: "SIGNUP", url: "/signup", isAction: true },
 ];
 
 export default App;

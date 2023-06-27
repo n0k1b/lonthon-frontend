@@ -5,7 +5,10 @@ const InfoCard = (props) => {
   return (
     <div className={styles.container}>
       <p className={styles.title}>{props.title}</p>
-      <p className={styles.num}>${props.amount}</p>
+      <p className={styles.num}>
+        {props.sign}
+        {props.amount}
+      </p>
     </div>
   );
 };
