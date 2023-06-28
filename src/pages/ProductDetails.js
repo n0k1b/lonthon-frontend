@@ -176,6 +176,16 @@ const ProductDetails = () => {
                         />
                       </div>
                     )}
+
+                    {/* {content.media_type === 4 (
+                      <div>
+                        <video
+                          src={URL.createObjectURL(content.media)}
+                          height={500}
+                          controls
+                        />
+                      </div>
+                    )} */}
                   </div>
                 </div>
               </div>

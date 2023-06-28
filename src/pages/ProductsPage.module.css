@@ -221,3 +221,11 @@
   font-size: 12px;
   color: red;
 }
+
+.link {
+  text-decoration: none;
+}
+
+.videoPlayer {
+  margin-top: 20px;
+}

@@ -47,6 +47,8 @@ const ProductsPage = () => {
   const [title, setTitle] = useState(null);
   const [description, setDescription] = useState(null);
   const [author, setAuthor] = useState([]);
+  const [selectedVideo, setSelectedVideo] = useState(null);
+  const [videoFile, setVideoFile] = useState(null);
 
   const [num, setNum] = useState(1);
   const [authorNum, setAuthorNum] = useState([1]);
@@ -196,7 +198,7 @@ const ProductsPage = () => {
     {
       name: "",
       cell: (row) => (
-        <Link to={`/content/${row.id}`}>
+        <Link className={styles.link} to={`/content/${row.id}`}>
           <GreyBtn>Details</GreyBtn>
         </Link>
       ),
@@ -334,10 +336,12 @@ const ProductsPage = () => {
     if (addPdf) content = pdfFile;
     if (addText) content = textContent;
     if (addImage) content = image;
+    if (addVideo) content = videoFile;
 
+    if (addImage) cType = 0;
     if (addPdf) cType = 1;
     if (addText) cType = 2;
-    if (addImage) cType = 0;
+    if (addVideo) cType = 4;
 
     if (
       title &&
@@ -365,33 +369,17 @@ const ProductsPage = () => {
       };
 
       console.log(data);
-      const token = document.cookie.match(/XSRF-TOKEN=([^;]+)/);
 
       try {
         console.log("start");
-        // const response = await fetch(`https://admin.lonthonaloy.com/api/test`, {
-        //   method: "POST",
-        //   headers: {
-        //     "Content-Type": "application/json",
-        //     "X-CSRF-Token": token,
-        //   },
-        //   body: JSON.stringify(data),
-        // });
-
         const response = await fetch(`${baseURL}/content-upload`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
-            "X-CSRF-Token": token,
+            Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify(data),
         });
-
-        // const response = await axios.post(`${baseURL}/content-upload`, data, {
-        //   headers: {
-        //     "Content-Type": "application/json",
-        //   },
-        // });
 
         console.log("response:", response);
 
@@ -404,7 +392,6 @@ const ProductsPage = () => {
 
         setSubmitMsg(data2.message);
         setSubmittedPopUp(true);
-        goBackHandler();
       } catch (error) {
         console.error("Error:", error);
         console.log("Error");
@@ -421,6 +408,9 @@ const ProductsPage = () => {
       if (author.length !== 0) setAuthorError(false);
     }
     dispatch(homepageActions.setIsLoading(false));
+    setTimeout(() => {
+      goBackHandler();
+    }, 3000);
   };
 
   const goBackHandler = () => {
@@ -432,6 +422,8 @@ const ProductsPage = () => {
     setDescription(null);
     setAuthor([]);
     setImage(null);
+    setSelectedVideo(null);
+    setVideoFile(null);
 
     setTitleError(false);
     setDesError(false);
@@ -444,6 +436,22 @@ const ProductsPage = () => {
     setPdfFile(null);
     setTextContent("");
     setImage(null);
+    setSelectedVideo(null);
+    setVideoFile(null);
+  };
+
+  const handleVideoChange = (event) => {
+    if (event.target.files[0]) {
+      const file = event.target.files[0];
+      console.log(file);
+      setSelectedVideo(URL.createObjectURL(file));
+      setVideoFile(file);
+      console.log(URL.createObjectURL(file), "URL");
+    }
+  };
+
+  const removeVideoHandler = () => {
+    setSelectedVideo(null);
   };
 
   return (
@@ -811,7 +819,34 @@ const ProductsPage = () => {
                         />
                       </div>
                     )}
-                    {addVideo && <div>Add video</div>}
+                    {addVideo && (
+                      <div>
+                        <p className={classes.formTitle}>Content</p>
+                        <div
+                          className={classes.uploadImg}
+                          onClick={() =>
+                            document.querySelector(".input_video").click()
+                          }
+                        >
+                          <p>Upload Video</p>
+                        </div>
+                        <input
+                          type="file"
+                          accept="video/*"
+                          onChange={handleVideoChange}
+                          className="input_video"
+                          hidden
+                        />
+                        {selectedVideo && (
+                          <div className={classes.videoPlayer}>
+                            <video src={selectedVideo} height={300} controls />
+                            <div onClick={removeVideoHandler}>
+                              <GreyBtn>Remove</GreyBtn>
+                            </div>
+                          </div>
+                        )}
+                      </div>
+                    )}
                   </div>
                   <div className={classes.TBSec}>
                     <p className={classes.formTitle}>Thumbnail and Banner</p>
