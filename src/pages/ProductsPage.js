@@ -96,46 +96,35 @@ const ProductsPage = () => {
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
-    const reader = new FileReader();
-    try {
-      reader.readAsDataURL(file);
-      reader.onload = () => {
-        if (!image) {
-          setImage([reader.result]);
-        } else {
-          setImage([...image, reader.result]);
-        }
-      };
-    } catch {
-      console.log("Not selected");
+    if(file) {
+      if (!image) {
+        setImage([file]);
+      } else {
+        setImage([...image, file]);
+      }
+    } else {
+      console.log("No file selected");
     }
   };
+
 
   const handleImageChangeThumb = (event) => {
-    const file = event.target.files[0];
-    const reader = new FileReader();
-    try {
-      reader.readAsDataURL(file);
-      reader.onload = () => {
-        setThumbImg(reader.result);
-      };
-    } catch {
-      console.log("Not selected");
+    if(event.target.files[0]) {
+      setThumbImg(event.target.files[0]);
+    } else {
+      console.log("No file selected");
     }
   };
 
+
   const handleImageChangeBan = (event) => {
-    const file = event.target.files[0];
-    const reader = new FileReader();
-    try {
-      reader.readAsDataURL(file);
-      reader.onload = () => {
-        setBanImg(reader.result);
-      };
-    } catch {
-      console.log("Not selected");
+    if(event.target.files[0]) {
+      setBanImg(event.target.files[0]);
+    } else {
+      console.log("No file selected");
     }
   };
+
 
   const authorHandler = () => {
     setNum(num + 1);
@@ -329,19 +318,110 @@ const ProductsPage = () => {
   }, [isLoggedIn]);
 
   //Post Data
+  // const postDataHandler = async () => {
+  //   let content = "";
+  //   let cType = "";
+
+  //   if (addPdf) content = pdfFile;
+  //   if (addText) content = textContent;
+  //   if (addImage) content = image;
+  //   if (addVideo) content = videoFile;
+
+  //   if (addImage) cType = 0;
+  //   if (addPdf) cType = 1;
+  //   if (addText) cType = 2;
+  //   if (addVideo) cType = 4;
+
+  //   if (
+  //     title &&
+  //     thumbImg &&
+  //     banImg &&
+  //     description &&
+  //     author &&
+  //     selectedCategory &&
+  //     selectedSubCategory &&
+  //     selectedGenre
+  //   ) {
+  //     dispatch(homepageActions.setIsLoading(true));
+  //     const data = {
+  //       title: title,
+  //       category_id: selectedCategory,
+  //       sub_category_id: selectedSubCategory,
+  //       genre_id: selectedGenre,
+  //       thumbnail_image: thumbImg,
+  //       feature_image: banImg,
+  //       summary: description,
+  //       author: author,
+  //       type: 0,
+  //       content_type: cType,
+  //       content: addText ? textContent : content,
+  //     };
+
+  //     console.log(data);
+
+  //     try {
+  //       console.log("start");
+  //       const response = await fetch(`${baseURL}/content-upload`, {
+  //         method: "POST",
+  //         headers: {
+  //           "Content-Type": "application/json",
+  //           Authorization: `Bearer ${token}`,
+  //         },
+  //         body: JSON.stringify(data),
+  //       });
+
+  //       console.log("response:", response);
+
+  //       if (!response.ok) {
+  //         throw new Error("Request failed");
+  //       }
+
+  //       const data2 = await response.json();
+  //       console.log("Data:", data2);
+
+  //       setSubmitMsg(data2.message);
+  //       setSubmittedPopUp(true);
+  //     } catch (error) {
+  //       console.error("Error:", error);
+  //       console.log("Error");
+  //     }
+  //   } else {
+  //     setFormFillUpError(true);
+
+  //     if (!title) setTitleError(true);
+  //     if (!description) setDesError(true);
+  //     if (author.length === 0) setAuthorError(true);
+
+  //     if (title) setTitleError(false);
+  //     if (description) setDesError(false);
+  //     if (author.length !== 0) setAuthorError(false);
+  //   }
+  //   dispatch(homepageActions.setIsLoading(false));
+  //   setTimeout(() => {
+  //     goBackHandler();
+  //   }, 3000);
+  // };
+
   const postDataHandler = async () => {
-    let content = "";
+    let content;
     let cType = "";
 
-    if (addPdf) content = pdfFile;
-    if (addText) content = textContent;
-    if (addImage) content = image;
-    if (addVideo) content = videoFile;
-
-    if (addImage) cType = 0;
-    if (addPdf) cType = 1;
-    if (addText) cType = 2;
-    if (addVideo) cType = 4;
+    if (addPdf) {
+      content = pdfFile;
+      cType = 1;
+    }
+    if (addText) {
+      content = textContent;
+      cType = 2;
+    }
+    if (addImage) {
+      content = image;
+      cType = 0;
+    }
+    if (addVideo) {
+      content = videoFile;
+      cType = 4;
+    }
 
     if (
       title &&
@@ -354,31 +434,28 @@ const ProductsPage = () => {
       selectedGenre
     ) {
       dispatch(homepageActions.setIsLoading(true));
-      const data = {
-        title: title,
-        category_id: selectedCategory,
-        sub_category_id: selectedSubCategory,
-        genre_id: selectedGenre,
-        thumbnail_image: thumbImg,
-        feature_image: banImg,
-        summary: description,
-        author: author,
-        type: 0,
-        content_type: cType,
-        content: addText ? textContent : content,
-      };
 
-      console.log(data);
+      const data = new FormData();
+      data.append('title', title);
+      data.append('category_id', selectedCategory);
+      data.append('sub_category_id', selectedSubCategory);
+      data.append('genre_id', selectedGenre);
+      data.append('thumbnail_image', thumbImg);
+      data.append('feature_image', banImg);
+      data.append('summary', description);
+      data.append('author', author);
+      data.append('type', 0);
+      data.append('content_type', cType);
+      data.append('content', content);
 
       try {
         console.log("start");
         const response = await fetch(`${baseURL}/content-upload`, {
           method: "POST",
           headers: {
-            "Content-Type": "application/json",
             Authorization: `Bearer ${token}`,
           },
-          body: JSON.stringify(data),
+          body: data,
         });
 
         console.log("response:", response);
@@ -412,6 +489,7 @@ const ProductsPage = () => {
       goBackHandler();
     }, 3000);
   };
+
 
   const goBackHandler = () => {
     setPdfFile(null);
@@ -761,32 +839,32 @@ const ProductsPage = () => {
                           hidden
                           onChange={handleImageChange}
                         />
-                        {image &&
-                          image.map((item, i) => (
-                            <div key={i} className={classes.imagePrevCon}>
-                              <img
-                                className={classes.previewImg}
-                                src={item}
-                                id={`contentRem${i}`}
-                                onClick={(e) => {
-                                  const selectedImg = image.filter(
-                                    (item) => item !== e.target.src
-                                  );
-                                  setImage(selectedImg);
-                                }}
-                              />
-                              <p
-                                className={classes.imagePrevRem}
-                                onClick={() => {
-                                  document
-                                    .querySelector(`#contentRem${i}`)
-                                    .click();
-                                }}
-                              >
-                                Click to Remove
-                              </p>
-                            </div>
-                          ))}
+                       {image &&
+  image.map((item, i) => (
+    <div key={i} className={classes.imagePrevCon}>
+      <img
+        className={classes.previewImg}
+        src={URL.createObjectURL(item)}
+        id={`contentRem${i}`}
+        onClick={(e) => {
+          const selectedImg = image.filter(
+            (item) => URL.createObjectURL(item) !== e.target.src
+          );
+          setImage(selectedImg);
+        }}
+      />
+      <p
+        className={classes.imagePrevRem}
+        onClick={() => {
+          document.querySelector(`#contentRem${i}`).click();
+        }}
+      >
+        Click to Remove
+      </p>
+    </div>
+  ))
+}
+
                         {addImg && (
                           <img
                             className={classes.addimgBtn}
@@ -867,26 +945,27 @@ const ProductsPage = () => {
                       hidden
                       onChange={handleImageChangeThumb}
                     />
-                    {thumbImg && (
-                      <div className={classes.imagePrevCon}>
-                        <img
-                          className={classes.previewImg}
-                          src={thumbImg}
-                          onClick={() => {
-                            setThumbImg(null);
-                          }}
-                          id="thumbImgRem"
-                        />
-                        <p
-                          className={classes.imagePrevRem}
-                          onClick={() => {
-                            document.querySelector("#thumbImgRem").click();
-                          }}
-                        >
-                          Click to Remove
-                        </p>
-                      </div>
-                    )}
+
+                   {thumbImg && (
+  <div className={classes.imagePrevCon}>
+    <img
+      className={classes.previewImg}
+      src={URL.createObjectURL(thumbImg)}
+      onClick={() => {
+        setThumbImg(null);
+      }}
+      id="thumbImgRem"
+    />
+    <p
+      className={classes.imagePrevRem}
+      onClick={() => {
+        document.querySelector("#thumbImgRem").click();
+      }}
+    >
+      Click to Remove
+    </p>
+  </div>
+)}
 
                     {!banImg && (
                       <div
@@ -906,25 +985,26 @@ const ProductsPage = () => {
                       onChange={handleImageChangeBan}
                     />
                     {banImg && (
-                      <div className={classes.imagePrevCon}>
-                        <img
-                          className={classes.previewImg}
-                          src={banImg}
-                          onClick={() => {
-                            setBanImg(null);
-                          }}
-                          id="banImgRem"
-                        />
-                        <p
-                          className={classes.imagePrevRem}
-                          onClick={() => {
-                            document.querySelector("#banImgRem").click();
-                          }}
-                        >
-                          Click to Remove
-                        </p>
-                      </div>
-                    )}
+  <div className={classes.imagePrevCon}>
+    <img
+      className={classes.previewImg}
+      src={URL.createObjectURL(banImg)}
+      onClick={() => {
+        setBanImg(null);
+      }}
+      id="banImgRem"
+    />
+    <p
+      className={classes.imagePrevRem}
+      onClick={() => {
+        document.querySelector("#banImgRem").click();
+      }}
+    >
+      Click to Remove
+    </p>
+  </div>
+)}
+
                   </div>
                   <div className={classes.saveBtn} onClick={log}>
                     <GreyBtn>Save</GreyBtn>
