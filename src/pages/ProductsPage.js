@@ -49,6 +49,8 @@ const ProductsPage = () => {
   const [author, setAuthor] = useState([]);
   const [selectedVideo, setSelectedVideo] = useState(null);
   const [videoFile, setVideoFile] = useState(null);
+  const [type, setType] = useState();
+  const [price, setPrice] = useState(0);
 
   const [num, setNum] = useState(1);
   const [authorNum, setAuthorNum] = useState([1]);
@@ -72,6 +74,7 @@ const ProductsPage = () => {
   const [titleError, setTitleError] = useState(false);
   const [desError, setDesError] = useState(false);
   const [authorError, setAuthorError] = useState(false);
+  const [priceError, setPriceError] = useState(false);
 
   const [loading, setLoading] = useState(false);
   const [dashboardData, setDashboardData] = useState();
@@ -96,7 +99,7 @@ const ProductsPage = () => {
 
   const handleImageChange = (event) => {
     const file = event.target.files[0];
-    if(file) {
+    if (file) {
       if (!image) {
         setImage([file]);
       } else {
@@ -107,24 +110,21 @@ const ProductsPage = () => {
     }
   };
 
-
   const handleImageChangeThumb = (event) => {
-    if(event.target.files[0]) {
+    if (event.target.files[0]) {
       setThumbImg(event.target.files[0]);
     } else {
       console.log("No file selected");
     }
   };
 
-
   const handleImageChangeBan = (event) => {
-    if(event.target.files[0]) {
+    if (event.target.files[0]) {
       setBanImg(event.target.files[0]);
     } else {
       console.log("No file selected");
     }
   };
-
 
   const authorHandler = () => {
     setNum(num + 1);
@@ -243,6 +243,10 @@ const ProductsPage = () => {
       return;
     }
     setSubmittedPopUp(false);
+  };
+
+  const handleTypeSelect = (e) => {
+    setType(parseInt(e.target.value));
   };
 
   //Data Fetch
@@ -431,22 +435,26 @@ const ProductsPage = () => {
       author &&
       selectedCategory &&
       selectedSubCategory &&
-      selectedGenre
+      selectedGenre &&
+      type &&
+      type === 1
+        ? price
+        : true
     ) {
       dispatch(homepageActions.setIsLoading(true));
 
       const data = new FormData();
-      data.append('title', title);
-      data.append('category_id', selectedCategory);
-      data.append('sub_category_id', selectedSubCategory);
-      data.append('genre_id', selectedGenre);
-      data.append('thumbnail_image', thumbImg);
-      data.append('feature_image', banImg);
-      data.append('summary', description);
-      data.append('author', author);
-      data.append('type', 0);
-      data.append('content_type', cType);
-      data.append('content', content);
+      data.append("title", title);
+      data.append("category_id", selectedCategory);
+      data.append("sub_category_id", selectedSubCategory);
+      data.append("genre_id", selectedGenre);
+      data.append("thumbnail_image", thumbImg);
+      data.append("feature_image", banImg);
+      data.append("summary", description);
+      data.append("author", author);
+      data.append("type", 0);
+      data.append("content_type", cType);
+      data.append("content", content);
 
       try {
         console.log("start");
@@ -479,22 +487,24 @@ const ProductsPage = () => {
       if (!title) setTitleError(true);
       if (!description) setDesError(true);
       if (author.length === 0) setAuthorError(true);
+      if (!price) setPriceError(true);
 
       if (title) setTitleError(false);
       if (description) setDesError(false);
       if (author.length !== 0) setAuthorError(false);
+      if (price) setPriceError(false);
     }
     dispatch(homepageActions.setIsLoading(false));
+    setSubmittedPopUp(true);
     setTimeout(() => {
       goBackHandler();
-    }, 3000);
+    }, 5000);
   };
-
 
   const goBackHandler = () => {
     setPdfFile(null);
-    setThumbImg([]);
-    setBanImg([]);
+    setThumbImg();
+    setBanImg();
     setTextContent("");
     setTitle(null);
     setDescription(null);
@@ -502,10 +512,13 @@ const ProductsPage = () => {
     setImage(null);
     setSelectedVideo(null);
     setVideoFile(null);
+    setPrice(0);
+    setType();
 
     setTitleError(false);
     setDesError(false);
     setAuthorError(false);
+    setPriceError(false);
 
     setUpload(false);
   };
@@ -770,6 +783,40 @@ const ProductsPage = () => {
                       <p className={classes.errorTxt}>Please add an author!</p>
                     )}
                   </div>
+
+                  <div>
+                    <select
+                      className={classes.filterOp}
+                      name="filter"
+                      onChange={handleTypeSelect}
+                    >
+                      <option value="" disabled selected>
+                        Select Type
+                      </option>
+                      <option value={0}>Free</option>
+                      <option value={1}>Paid</option>
+                      <option value={2}>Negotiation</option>
+                    </select>
+
+                    {type === 1 && (
+                      <div>
+                        <p className={classes.formTitle}>Price*</p>
+                        <input
+                          className={classes.inputText}
+                          type="number"
+                          onChange={(e) => {
+                            setPrice(parseInt(e.target.value));
+                          }}
+                        />
+                        {priceError && (
+                          <p className={classes.errorTxt}>
+                            Please add a Price!
+                          </p>
+                        )}
+                      </div>
+                    )}
+                  </div>
+
                   <div className={classes.uploadContentCon}>
                     <p className={classes.ucTitle}>Upload your content</p>
                     <div>
@@ -839,31 +886,33 @@ const ProductsPage = () => {
                           hidden
                           onChange={handleImageChange}
                         />
-                       {image &&
-  image.map((item, i) => (
-    <div key={i} className={classes.imagePrevCon}>
-      <img
-        className={classes.previewImg}
-        src={URL.createObjectURL(item)}
-        id={`contentRem${i}`}
-        onClick={(e) => {
-          const selectedImg = image.filter(
-            (item) => URL.createObjectURL(item) !== e.target.src
-          );
-          setImage(selectedImg);
-        }}
-      />
-      <p
-        className={classes.imagePrevRem}
-        onClick={() => {
-          document.querySelector(`#contentRem${i}`).click();
-        }}
-      >
-        Click to Remove
-      </p>
-    </div>
-  ))
-}
+                        {image &&
+                          image.map((item, i) => (
+                            <div key={i} className={classes.imagePrevCon}>
+                              <img
+                                className={classes.previewImg}
+                                src={URL.createObjectURL(item)}
+                                id={`contentRem${i}`}
+                                onClick={(e) => {
+                                  const selectedImg = image.filter(
+                                    (item) =>
+                                      URL.createObjectURL(item) !== e.target.src
+                                  );
+                                  setImage(selectedImg);
+                                }}
+                              />
+                              <p
+                                className={classes.imagePrevRem}
+                                onClick={() => {
+                                  document
+                                    .querySelector(`#contentRem${i}`)
+                                    .click();
+                                }}
+                              >
+                                Click to Remove
+                              </p>
+                            </div>
+                          ))}
 
                         {addImg && (
                           <img
@@ -946,26 +995,26 @@ const ProductsPage = () => {
                       onChange={handleImageChangeThumb}
                     />
 
-                   {thumbImg && (
-  <div className={classes.imagePrevCon}>
-    <img
-      className={classes.previewImg}
-      src={URL.createObjectURL(thumbImg)}
-      onClick={() => {
-        setThumbImg(null);
-      }}
-      id="thumbImgRem"
-    />
-    <p
-      className={classes.imagePrevRem}
-      onClick={() => {
-        document.querySelector("#thumbImgRem").click();
-      }}
-    >
-      Click to Remove
-    </p>
-  </div>
-)}
+                    {thumbImg && (
+                      <div className={classes.imagePrevCon}>
+                        <img
+                          className={classes.previewImg}
+                          src={URL.createObjectURL(thumbImg)}
+                          onClick={() => {
+                            setThumbImg(null);
+                          }}
+                          id="thumbImgRem"
+                        />
+                        <p
+                          className={classes.imagePrevRem}
+                          onClick={() => {
+                            document.querySelector("#thumbImgRem").click();
+                          }}
+                        >
+                          Click to Remove
+                        </p>
+                      </div>
+                    )}
 
                     {!banImg && (
                       <div
@@ -985,26 +1034,25 @@ const ProductsPage = () => {
                       onChange={handleImageChangeBan}
                     />
                     {banImg && (
-  <div className={classes.imagePrevCon}>
-    <img
-      className={classes.previewImg}
-      src={URL.createObjectURL(banImg)}
-      onClick={() => {
-        setBanImg(null);
-      }}
-      id="banImgRem"
-    />
-    <p
-      className={classes.imagePrevRem}
-      onClick={() => {
-        document.querySelector("#banImgRem").click();
-      }}
-    >
-      Click to Remove
-    </p>
-  </div>
-)}
-
+                      <div className={classes.imagePrevCon}>
+                        <img
+                          className={classes.previewImg}
+                          src={URL.createObjectURL(banImg)}
+                          onClick={() => {
+                            setBanImg(null);
+                          }}
+                          id="banImgRem"
+                        />
+                        <p
+                          className={classes.imagePrevRem}
+                          onClick={() => {
+                            document.querySelector("#banImgRem").click();
+                          }}
+                        >
+                          Click to Remove
+                        </p>
+                      </div>
+                    )}
                   </div>
                   <div className={classes.saveBtn} onClick={log}>
                     <GreyBtn>Save</GreyBtn>
@@ -1013,33 +1061,6 @@ const ProductsPage = () => {
               </div>
             )}
           </div>
-          <Snackbar
-            open={formFillUpError}
-            autoHideDuration={6000}
-            onClose={handleClose}
-          >
-            <Alert
-              onClose={handleClose}
-              severity="warning"
-              sx={{ width: "100%" }}
-            >
-              Please fill out the form!
-            </Alert>
-          </Snackbar>
-
-          <Snackbar
-            open={submittedPopUp}
-            autoHideDuration={6000}
-            onClose={submitHandleClose}
-          >
-            <Alert
-              onClose={submitHandleClose}
-              severity="success"
-              sx={{ width: "100%" }}
-            >
-              {submitMsg}
-            </Alert>
-          </Snackbar>
         </div>
       )}
 
@@ -1055,6 +1076,30 @@ const ProductsPage = () => {
           <CircularProgress color="inherit" />
         </Box>
       )}
+
+      <Snackbar
+        open={formFillUpError}
+        autoHideDuration={6000}
+        onClose={handleClose}
+      >
+        <Alert onClose={handleClose} severity="warning" sx={{ width: "100%" }}>
+          Please fill out the form!
+        </Alert>
+      </Snackbar>
+
+      <Snackbar
+        open={submittedPopUp}
+        autoHideDuration={6000}
+        onClose={submitHandleClose}
+      >
+        <Alert
+          onClose={submitHandleClose}
+          severity="success"
+          sx={{ width: "100%" }}
+        >
+          {submitMsg}
+        </Alert>
+      </Snackbar>
     </>
   );
 };
