@@ -72,7 +72,12 @@ const ProductDetails = () => {
   };
 
   useEffect(() => {
-    dataFetch();
+    try {
+      dataFetch();
+    } catch (error) {
+      console.error(error);
+      console.log(error);
+    }
   }, []);
 
   return (
@@ -177,15 +182,15 @@ const ProductDetails = () => {
                       </div>
                     )}
 
-                    {/* {content.media_type === 4 (
-                      <div>
+                    {content.media_type === 4 && (
+                      <div className={styles.videoPlayerCon}>
                         <video
-                          src={URL.createObjectURL(content.media)}
+                          src="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
                           height={500}
                           controls
                         />
                       </div>
-                    )} */}
+                    )}
                   </div>
                 </div>
               </div>

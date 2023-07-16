@@ -455,6 +455,7 @@ const ProductsPage = () => {
       data.append("type", 0);
       data.append("content_type", cType);
       data.append("content", content);
+      type === 1 ? data.append("price", price) : data.append("price", 0);
 
       try {
         console.log("start");
