@@ -29,6 +29,7 @@ function App() {
   const [busSettings, setBusSettings] = useState();
 
   const getBusinessSettingsData = async () => {
+    console.log("SHOULD PRINT ONLY ONCE");
     dispatch(homepageActions.setIsLoading(true));
     const response = await fetch(`${baseURL}/business-settings`);
 
