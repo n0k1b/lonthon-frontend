@@ -91,13 +91,9 @@ const Navbar = ({ menuItems }) => {
               <>
                 {!menu.submenu ? (
                   <>
-                    {!menu.isAction ? (
+                    {!menu.id && (
                       <Link to={menu.url} className={styles.link} key={index}>
                         <p className={styles.nav_link}>{menu.label}</p>
-                      </Link>
-                    ) : (
-                      <Link to={menu.url} className={styles.link} key={index}>
-                        <GreyBtn>{menu.label}</GreyBtn>
                       </Link>
                     )}
                   </>
@@ -107,36 +103,35 @@ const Navbar = ({ menuItems }) => {
                     onMouseEnter={() => toggleDropdown(index, true)}
                     onMouseLeave={() => toggleDropdown(index, false)}
                   >
-                    <Link className={styles.link} to={menu.url}>
-                      <p className={styles.nav_link}>{menu.label}</p>
-                    </Link>
+                    <p className={styles.nav_link}>{menu.label}</p>
                     {dropdownStates && dropdownStates[index] && (
                       <div className={styles.dropDown}>
-                        <DropDown links={menu.submenu} />
+                        <DropDown links={menu.submenu} catg={menu.id} />
                       </div>
                     )}
                   </div>
                 )}
               </>
             ))}
+
+            {!isLoggedIn && (
+              <>
+                <Link className={styles.link} to="/login">
+                  <p className={styles.nav_link}>LOGIN</p>
+                </Link>
+                <Link className={styles.link} to="/signup">
+                  <GreyBtn>SIGNUP</GreyBtn>
+                </Link>
+              </>
+            )}
+
+            {isLoggedIn && (
+              <div onClick={logoutHandler}>
+                <GreyBtn>LOGOUT</GreyBtn>
+              </div>
+            )}
           </div>
 
-          {!isLoggedIn && (
-            <>
-              <Link className={styles.link} to="/login">
-                <p className={styles.nav_link}>LOGIN</p>
-              </Link>
-              <Link className={styles.link} to="/signup">
-                <GreyBtn>SIGNUP</GreyBtn>
-              </Link>
-            </>
-          )}
-
-          {isLoggedIn && (
-            <div onClick={logoutHandler}>
-              <GreyBtn>LOGOUT</GreyBtn>
-            </div>
-          )}
           {/* Add expanded class to toggle menu mobile view */}
           {/* <div className={`${styles.links} mobile-links`} ref={toggleMenu}>
             <Link to="/" className={styles.link}>
@@ -226,7 +221,7 @@ const Wrapper = styled.div`
   }
   .mobile-links.expanded {
     padding: 10px 0px;
-    max-height: ${(props) => props.menuSize * 67.78 + 20}px;
+    max-height: ${(props) => props.menuSize * 67.78 + 20 + 60 + 60}px;
   }
 `;
 export default Navbar;

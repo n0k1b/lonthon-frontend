@@ -121,8 +121,6 @@ function App() {
               <Routes>
                 <Route exact path="/" element={<HomePage />} />
 
-                <Route path="/literature" element={<LiteraturePage />} />
-
                 <Route exact path="/dashboard" element={<DashboardPage />} />
 
                 <Route
@@ -137,6 +135,11 @@ function App() {
                 <Route path="/login" element={<LoginPage />} />
 
                 <Route path="/signup" element={<Signup />} />
+
+                <Route
+                  path="/contents/:cat/:subCat"
+                  element={<LiteraturePage />}
+                />
               </Routes>
             </ScrollToTop>
 
@@ -152,24 +155,36 @@ const NavbarMenuItems = [
   { label: "HOME", url: "/" },
   {
     label: "LITERATUE",
-    url: "/literature",
-    submenu: ["Novel", "Poems", "Others"],
+    id: 1,
+    submenu: [
+      { name: "Novel", id: 1 },
+      { name: "Novel", id: 2 },
+      { name: "Others", id: 3 },
+    ],
   },
   {
     label: "MEDIA CONTENT",
-    url: "/media",
-    submenu: ["Script", "Lyrics", "Documentary", "Short Films", "TVC"],
+    id: 2,
+    submenu: [
+      { name: "Script", id: 1 },
+      { name: "Lyrics", id: 1 },
+      { name: "Documentary", id: 1 },
+      { name: "Short Films", id: 1 },
+      { name: "TVC", id: 1 },
+    ],
   },
   {
     label: "AUDIO E-BOOK",
-    url: "/audio",
-    submenu: ["Novel", "Poems", "Others"],
+    id: 3,
+    submenu: [
+      { name: "Novel", id: 1 },
+      { name: "Novel", id: 2 },
+      { name: "Others", id: 3 },
+    ],
   },
-  { label: "OTHERS", url: "/others" },
-  { label: "PROMOTIONS", url: "/promotions" },
-  { label: "DASHBOARD", url: "/dashboard" },
-  // { label: "LOGIN", url: "/login" },
-  // { label: "SIGNUP", url: "/signup", isAction: true },
+  { label: "OTHERS", id: null, url: "others" },
+  { label: "PROMOTIONS", id: null, url: "promotions" },
+  { label: "DASHBOARD", id: null, url: "dashboard" },
 ];
 
 export default App;

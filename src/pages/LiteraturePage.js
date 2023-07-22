@@ -15,6 +15,7 @@ import card2 from "../image/card2.png";
 import card3 from "../image/card3.png";
 import LongCard from "../components/UI/LongCard";
 import { baseURL } from "../api";
+import { useParams } from "react-router-dom";
 
 const FILTER_OPTIONS = [
   "History",
@@ -86,6 +87,12 @@ const CONTENT = [
 ];
 
 const LiteraturePage = () => {
+  const param = useParams();
+  const category = param.cat;
+  const subCategory = param.subCat;
+  console.log("category", category);
+  console.log("subCategory", subCategory);
+
   const [filterOpen, setFilterOpen] = useState(true);
   const [filters, setFilters] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);

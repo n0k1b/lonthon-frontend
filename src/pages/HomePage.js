@@ -5,6 +5,7 @@ import LiteratureSection from "../components/body/home/LiteratureSection";
 import MediaSection from "../components/body/home/MediaSection";
 import AudioSection from "../components/body/home/AudioSection";
 import { useSelector } from "react-redux";
+import background from "../image/background_home.png";
 
 const HomePage = () => {
   const homepageData = useSelector((state) => state.homepage.homepageData);
@@ -16,8 +17,15 @@ const HomePage = () => {
         <img
           className={styles.cover}
           alt="cover_image"
-          src={homepageData.homepage_banner_image}
+          src={background}
+          // src={homepageData.homepage_banner_image}
         />
+        <div>
+          <img
+            className={styles.coverImg}
+            src={homepageData.homepage_banner_image}
+          />
+        </div>
         <div className={styles.text_area}>
           <p className={styles.title}>{homepageData.homepage_title}</p>
           <p className={styles.des}>{homepageData.homepage_description}</p>
