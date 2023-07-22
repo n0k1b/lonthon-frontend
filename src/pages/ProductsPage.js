@@ -454,7 +454,9 @@ const ProductsPage = () => {
       data.append("author", author);
       data.append("type", 0);
       data.append("content_type", cType);
-      data.append("content", content);
+      for(let i = 0; i < content.length; i++){
+        data.append("content[]", content[i]);
+    }
       type === 1 ? data.append("price", price) : data.append("price", 0);
 
       try {
