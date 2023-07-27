@@ -2,7 +2,7 @@ import React, { useEffect, useState, useRef } from "react";
 import styles from "./DashboardPage.module.css";
 import classes from "./ProductsPage.module.css";
 import dp from "../image/dp.jpg";
-import { Link, Navigate } from "react-router-dom";
+import { Link, Navigate, useNavigate } from "react-router-dom";
 import DataTable from "react-data-table-component";
 import GreyBtn from "../components/UI/GreyBtn";
 import addBtn from "../image/addBtn.png";
@@ -24,6 +24,26 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
 import { homepageActions } from "../redux/homepage-slice";
 
+import Modal from "@mui/material/Modal";
+import g1 from "../image/g1.jpg";
+import g2 from "../image/g2.jpg";
+import g3 from "../image/g3.jpg";
+import g4 from "../image/g4.jpg";
+
+const style = {
+  position: "absolute",
+  top: "50%",
+  left: "50%",
+  transform: "translate(-50%, -50%)",
+  width: 600,
+  bgcolor: "background.paper",
+  border: "2px solid #000",
+  boxShadow: 24,
+  p: 4,
+};
+
+const DUMMY_IMAGE = [g1, g2, g3, g4];
+
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
@@ -33,6 +53,7 @@ const ProductsPage = () => {
   const isLoggedIn = useSelector((state) => state.homepage.isLoggedIn);
   const token = useSelector((state) => state.homepage.token);
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const contentRef = useRef(null);
   const [search, setSearch] = useState("");
   const [data, setData] = useState();
@@ -79,6 +100,12 @@ const ProductsPage = () => {
   const [loading, setLoading] = useState(false);
   const [dashboardData, setDashboardData] = useState();
 
+  const [modalThumbOpen, setModalThumbOpen] = useState(false);
+  const modalCloseThumbHandler = () => setModalThumbOpen(false);
+
+  const [modalBanOpen, setModalBanOpen] = useState(false);
+  const modalCloseBanHandler = () => setModalBanOpen(false);
+
   useEffect(() => {
     if (dashboardData) {
       const result = dashboardData.contents.filter((data) =>
@@ -112,7 +139,7 @@ const ProductsPage = () => {
 
   const handleImageChangeThumb = (event) => {
     if (event.target.files[0]) {
-      setThumbImg(event.target.files[0]);
+      setThumbImg(URL.createObjectURL(event.target.files[0]));
     } else {
       console.log("No file selected");
     }
@@ -120,7 +147,7 @@ const ProductsPage = () => {
 
   const handleImageChangeBan = (event) => {
     if (event.target.files[0]) {
-      setBanImg(event.target.files[0]);
+      setBanImg(URL.createObjectURL(event.target.files[0]));
     } else {
       console.log("No file selected");
     }
@@ -436,10 +463,7 @@ const ProductsPage = () => {
       selectedCategory &&
       selectedSubCategory &&
       selectedGenre &&
-      type &&
-      type === 1
-        ? price
-        : true
+      type
     ) {
       dispatch(homepageActions.setIsLoading(true));
 
@@ -454,9 +478,9 @@ const ProductsPage = () => {
       data.append("author", author);
       data.append("type", 0);
       data.append("content_type", cType);
-      for(let i = 0; i < content.length; i++){
+      for (let i = 0; i < content.length; i++) {
         data.append("content[]", content[i]);
-    }
+      }
       type === 1 ? data.append("price", price) : data.append("price", 0);
 
       try {
@@ -484,6 +508,10 @@ const ProductsPage = () => {
         console.error("Error:", error);
         console.log("Error");
       }
+      setSubmittedPopUp(true);
+      setTimeout(() => {
+        goBackHandler();
+      }, 3000);
     } else {
       setFormFillUpError(true);
 
@@ -498,10 +526,6 @@ const ProductsPage = () => {
       if (price) setPriceError(false);
     }
     dispatch(homepageActions.setIsLoading(false));
-    setSubmittedPopUp(true);
-    setTimeout(() => {
-      goBackHandler();
-    }, 5000);
   };
 
   const goBackHandler = () => {
@@ -898,8 +922,7 @@ const ProductsPage = () => {
                                 id={`contentRem${i}`}
                                 onClick={(e) => {
                                   const selectedImg = image.filter(
-                                    (item) =>
-                                      URL.createObjectURL(item) !== e.target.src
+                                    (item) => item !== e.target.src
                                   );
                                   setImage(selectedImg);
                                 }}
@@ -979,15 +1002,23 @@ const ProductsPage = () => {
                     )}
                   </div>
                   <div className={classes.TBSec}>
-                    <p className={classes.formTitle}>Thumbnail and Banner</p>
+                    <p className={classes.formTitle}>Add Thumbnail</p>
                     {!thumbImg && (
-                      <div
-                        className={classes.uploadImg}
-                        onClick={() =>
-                          document.querySelector(".input_thumbImg").click()
-                        }
-                      >
-                        <p>Upload Thumbnail Image</p>
+                      <div className={classes.thumbImgSelectCon}>
+                        <div
+                          className={classes.uploadImg}
+                          onClick={() =>
+                            document.querySelector(".input_thumbImg").click()
+                          }
+                        >
+                          <p>Upload Thumbnail Image</p>
+                        </div>
+                        <div
+                          className={classes.uploadImg}
+                          onClick={() => setModalThumbOpen(true)}
+                        >
+                          <p>Choose From Gallery</p>
+                        </div>
                       </div>
                     )}
                     <input
@@ -1002,7 +1033,7 @@ const ProductsPage = () => {
                       <div className={classes.imagePrevCon}>
                         <img
                           className={classes.previewImg}
-                          src={URL.createObjectURL(thumbImg)}
+                          src={thumbImg}
                           onClick={() => {
                             setThumbImg(null);
                           }}
@@ -1019,14 +1050,24 @@ const ProductsPage = () => {
                       </div>
                     )}
 
+                    <p className={classes.formTitle}>Add Banner</p>
+
                     {!banImg && (
-                      <div
-                        className={classes.uploadImgBan}
-                        onClick={() =>
-                          document.querySelector(".input_banImg").click()
-                        }
-                      >
-                        <p>Upload Banner Image</p>
+                      <div className={classes.thumbImgSelectCon}>
+                        <div
+                          className={classes.uploadImgBan}
+                          onClick={() =>
+                            document.querySelector(".input_banImg").click()
+                          }
+                        >
+                          <p>Upload Banner Image</p>
+                        </div>
+                        <div
+                          className={classes.uploadImg}
+                          onClick={() => setModalBanOpen(true)}
+                        >
+                          <p>Choose From Gallery</p>
+                        </div>
                       </div>
                     )}
                     <input
@@ -1040,7 +1081,7 @@ const ProductsPage = () => {
                       <div className={classes.imagePrevCon}>
                         <img
                           className={classes.previewImg}
-                          src={URL.createObjectURL(banImg)}
+                          src={banImg}
                           onClick={() => {
                             setBanImg(null);
                           }}
@@ -1103,6 +1144,52 @@ const ProductsPage = () => {
           {submitMsg}
         </Alert>
       </Snackbar>
+
+      <Modal
+        open={modalThumbOpen}
+        onClose={modalCloseThumbHandler}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <div>
+            <p className={classes.pTitle}>Select Thumbnail</p>
+            {DUMMY_IMAGE.map((image) => (
+              <img
+                className={classes.modalImage}
+                src={image}
+                onClick={(e) => {
+                  setThumbImg(e.target.src);
+                  setModalThumbOpen(false);
+                }}
+              />
+            ))}
+          </div>
+        </Box>
+      </Modal>
+
+      <Modal
+        open={modalBanOpen}
+        onClose={modalCloseBanHandler}
+        aria-labelledby="modal-modal-title"
+        aria-describedby="modal-modal-description"
+      >
+        <Box sx={style}>
+          <div>
+            <p className={classes.pTitle}>Select Banner</p>
+            {DUMMY_IMAGE.map((image) => (
+              <img
+                className={classes.modalImage}
+                src={image}
+                onClick={(e) => {
+                  setBanImg(e.target.src);
+                  setModalBanOpen(false);
+                }}
+              />
+            ))}
+          </div>
+        </Box>
+      </Modal>
     </>
   );
 };
