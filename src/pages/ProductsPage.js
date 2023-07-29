@@ -12,10 +12,7 @@ import { BiText } from "react-icons/bi";
 import { baseURL } from "../api";
 
 import { Editor } from "@tinymce/tinymce-react";
-import axios from "axios";
 
-import Stack from "@mui/material/Stack";
-import Button from "@mui/material/Button";
 import Snackbar from "@mui/material/Snackbar";
 import MuiAlert from "@mui/material/Alert";
 import { useDispatch, useSelector } from "react-redux";
@@ -53,7 +50,6 @@ const ProductsPage = () => {
   const isLoggedIn = useSelector((state) => state.homepage.isLoggedIn);
   const token = useSelector((state) => state.homepage.token);
   const dispatch = useDispatch();
-  const navigate = useNavigate();
   const contentRef = useRef(null);
   const [search, setSearch] = useState("");
   const [data, setData] = useState();
@@ -72,6 +68,9 @@ const ProductsPage = () => {
   const [videoFile, setVideoFile] = useState(null);
   const [type, setType] = useState();
   const [price, setPrice] = useState(0);
+
+  const [thumbImgDisplay, setThumbImgDisplay] = useState(null);
+  const [banImgDisplay, setBanImgDisplay] = useState(null);
 
   const [num, setNum] = useState(1);
   const [authorNum, setAuthorNum] = useState([1]);
@@ -106,6 +105,9 @@ const ProductsPage = () => {
   const [modalBanOpen, setModalBanOpen] = useState(false);
   const modalCloseBanHandler = () => setModalBanOpen(false);
 
+  const [thumbImgGal, setThumbImgGal] = useState([]);
+  const [banImgGal, setBanImgGal] = useState([]);
+
   useEffect(() => {
     if (dashboardData) {
       const result = dashboardData.contents.filter((data) =>
@@ -139,7 +141,8 @@ const ProductsPage = () => {
 
   const handleImageChangeThumb = (event) => {
     if (event.target.files[0]) {
-      setThumbImg(URL.createObjectURL(event.target.files[0]));
+      setThumbImg(event.target.files[0]);
+      setThumbImgDisplay(URL.createObjectURL(event.target.files[0]));
     } else {
       console.log("No file selected");
     }
@@ -147,7 +150,8 @@ const ProductsPage = () => {
 
   const handleImageChangeBan = (event) => {
     if (event.target.files[0]) {
-      setBanImg(URL.createObjectURL(event.target.files[0]));
+      setBanImg(event.target.files[0]);
+      setBanImgDisplay(URL.createObjectURL(event.target.files[0]));
     } else {
       console.log("No file selected");
     }
@@ -273,7 +277,7 @@ const ProductsPage = () => {
   };
 
   const handleTypeSelect = (e) => {
-    setType(parseInt(e.target.value));
+    setType(e.target.value);
   };
 
   //Data Fetch
@@ -347,6 +351,34 @@ const ProductsPage = () => {
       dashboardDataFetch();
     }
   }, [isLoggedIn]);
+
+  const thumbGalImgFetch = async () => {
+    const response = await fetch(`${baseURL}/thumbnailImageGallery`);
+
+    if (!response.ok) return;
+
+    const data = await response.json();
+    setThumbImgGal(data.data);
+  };
+  useEffect(() => {
+    if (modalThumbOpen) {
+      thumbGalImgFetch();
+    }
+  }, [modalThumbOpen]);
+
+  const banGalImgFetch = async () => {
+    const response = await fetch(`${baseURL}/bannerImageGallery`);
+
+    if (!response.ok) return;
+
+    const data = await response.json();
+    setBanImgGal(data.data);
+  };
+  useEffect(() => {
+    if (modalBanOpen) {
+      banGalImgFetch();
+    }
+  }, [modalBanOpen]);
 
   //Post Data
   // const postDataHandler = async () => {
@@ -514,11 +546,22 @@ const ProductsPage = () => {
       }, 3000);
     } else {
       setFormFillUpError(true);
+      console.log([
+        title,
+        thumbImg,
+        banImg,
+        description,
+        author,
+        selectedCategory,
+        selectedSubCategory,
+        selectedGenre,
+        type,
+      ]);
 
       if (!title) setTitleError(true);
       if (!description) setDesError(true);
       if (author.length === 0) setAuthorError(true);
-      if (!price) setPriceError(true);
+      if (type === 2 && !price) setPriceError(true);
 
       if (title) setTitleError(false);
       if (description) setDesError(false);
@@ -820,9 +863,9 @@ const ProductsPage = () => {
                       <option value="" disabled selected>
                         Select Type
                       </option>
-                      <option value={0}>Free</option>
-                      <option value={1}>Paid</option>
-                      <option value={2}>Negotiation</option>
+                      <option value={"0"}>Free</option>
+                      <option value={"1"}>Paid</option>
+                      <option value={"2"}>Negotiation</option>
                     </select>
 
                     {type === 1 && (
@@ -1033,7 +1076,7 @@ const ProductsPage = () => {
                       <div className={classes.imagePrevCon}>
                         <img
                           className={classes.previewImg}
-                          src={thumbImg}
+                          src={thumbImgDisplay}
                           onClick={() => {
                             setThumbImg(null);
                           }}
@@ -1081,7 +1124,7 @@ const ProductsPage = () => {
                       <div className={classes.imagePrevCon}>
                         <img
                           className={classes.previewImg}
-                          src={banImg}
+                          src={banImgDisplay}
                           onClick={() => {
                             setBanImg(null);
                           }}
@@ -1154,12 +1197,16 @@ const ProductsPage = () => {
         <Box sx={style}>
           <div>
             <p className={classes.pTitle}>Select Thumbnail</p>
-            {DUMMY_IMAGE.map((image) => (
+            {thumbImgGal.map((image) => (
               <img
+                key={image.id}
                 className={classes.modalImage}
-                src={image}
+                src={image.image}
                 onClick={(e) => {
-                  setThumbImg(e.target.src);
+                  const url = e.target.src;
+                  const img = url.slice(49);
+                  setThumbImg(img);
+                  setThumbImgDisplay(e.target.src);
                   setModalThumbOpen(false);
                 }}
               />
@@ -1177,12 +1224,16 @@ const ProductsPage = () => {
         <Box sx={style}>
           <div>
             <p className={classes.pTitle}>Select Banner</p>
-            {DUMMY_IMAGE.map((image) => (
+            {banImgGal.map((image) => (
               <img
+                key={image.id}
                 className={classes.modalImage}
-                src={image}
+                src={image.image}
                 onClick={(e) => {
-                  setBanImg(e.target.src);
+                  const url = e.target.src;
+                  const img = url.slice(49);
+                  setBanImg(img);
+                  setBanImgDisplay(e.target.src);
                   setModalBanOpen(false);
                 }}
               />
