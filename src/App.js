@@ -97,9 +97,6 @@ function App() {
   return (
     <Router>
       <div className={styles.container}>
-        {/* <Navbar menuItems={navbarMenu} /> */}
-        <Navbar menuItems={NavbarMenuItems} />
-
         {isLoading && (
           <Box
             sx={{
@@ -114,6 +111,7 @@ function App() {
 
         {!isLoading && (
           <>
+            <Navbar menuItems={NavbarMenuItems} />
             <Helmet>
               <link rel="icon" href={favIcon} />
             </Helmet>
