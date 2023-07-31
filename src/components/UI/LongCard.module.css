@@ -1,6 +1,6 @@
 .container {
   width: 255px;
-  height: 599px;
+  height: 500px;
   background: #f8f8f8;
   border: 0.8px solid #6d6d6d;
   position: relative;
@@ -65,7 +65,7 @@
   color: #6d6d6d;
   font-size: 15px;
   margin: 0 20px;
-  height: 250px;
+  max-height: 250px;
   overflow: hidden;
 }
 
@@ -121,6 +121,9 @@
 
 .link {
   text-decoration: none;
+  margin-bottom: 20px;
+  margin-left: 10px;
+  margin-right: 10px;
 }
 
 @media screen and (max-width: 660px) {

@@ -5,11 +5,11 @@ import React, { useRef } from "react";
 import Slider from "react-slick";
 import LongCard from "../../UI/LongCard";
 
-import card1 from "../../../image/card1.png";
-import card2 from "../../../image/card2.png";
-import card3 from "../../../image/card3.png";
-
 const MultipleItems = ({ data }) => {
+  let DATA = data;
+  if (data.length < 3) {
+    DATA = [...data, ...data, ...data];
+  }
   const slider = useRef(null);
   const settings = {
     className: "center",
@@ -49,7 +49,7 @@ const MultipleItems = ({ data }) => {
         →
       </button>
       <Slider ref={slider} {...settings}>
-        {data.map((item, i) => (
+        {DATA.map((item, i) => (
           <div key={i}>
             <LongCard data={item} />
           </div>

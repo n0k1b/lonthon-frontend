@@ -17,22 +17,6 @@ import LongCard from "../components/UI/LongCard";
 import { baseURL } from "../api";
 import { useParams } from "react-router-dom";
 
-const FILTER_OPTIONS = [
-  "History",
-  "Fun",
-  "Humor",
-  "Political",
-  "Drama",
-  "Romance",
-  "Survival",
-  "Comic Books",
-  "Biographies",
-  "Learning & Education",
-  "Research",
-  "Superhero",
-  "Others",
-];
-
 const CONTENT = [
   {
     id: 1,
@@ -90,14 +74,20 @@ const LiteraturePage = () => {
   const param = useParams();
   const category = param.cat;
   const subCategory = param.subCat;
-  console.log("category", category);
-  console.log("subCategory", subCategory);
 
   const [filterOpen, setFilterOpen] = useState(true);
   const [filters, setFilters] = useState([]);
   const [currentPage, setCurrentPage] = useState(1);
   const [postsPerPage, setPostsPerPage] = useState(6);
   const [contentData, setContentData] = useState([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [genreData, setGenreData] = useState([]);
+  const [categoryName, setCategoryName] = useState("");
+  const [subCategoryName, setSubCategoryName] = useState("");
+
+  const [displayedContent, setDisplayedContent] = useState([]);
+  const [genreDisplay, setGenreDisplay] = useState();
+
   const toggleFilter = useRef();
 
   const filterToggleHandler = () => {
@@ -131,119 +121,174 @@ const LiteraturePage = () => {
   };
 
   const contentDataFetch = async () => {
-    const response = await fetch(`${baseURL}/content`);
+    setIsLoading(true);
+    const response = await fetch(
+      `${baseURL}/fetchContentFromSubCategory/${subCategory}`
+    );
 
     if (!response.ok) return;
 
     const data = await response.json();
 
-    console.log(data);
-    setContentData(data.data);
+    console.log(data.data.content_data);
+    setContentData(data.data.content_data);
+    setDisplayedContent(data.data.content_data);
+    setGenreData(data.data.genre);
+    setCategoryName(data.data.content_data[0].category_name);
+    setCategoryName(data.data.content_data[0].category_name);
+    setIsLoading(false);
   };
 
   useEffect(() => {
+    if (genreData.length !== 0) {
+      let temp = [];
+      genreData.map((item) => temp.push(item.genre));
+      setGenreDisplay(temp);
+    }
+  }, [, genreData]);
+
+  useEffect(() => {
+    if (filters.length === 0) {
+      setDisplayedContent(contentData);
+    } else {
+      const filteredContentData = contentData.filter((item) =>
+        filters.includes(item.genre_name)
+      );
+      setDisplayedContent(filteredContentData);
+    }
+  }, [filters]);
+
+  useEffect(() => {
     contentDataFetch();
-  }, []);
+  }, [category, subCategory]);
 
   return (
-    <div>
-      <div className={styles.cover}>
-        <div className={styles.coverText}>
-          <p className={styles.title}>Novel</p>
-          <p className={styles.route}>Literature &gt; Novel</p>
-        </div>
-      </div>
-
-      <Container>
-        <Sort>
-          <p className={styles.sort}>Sort By: </p>
-
-          <Box sx={{ minWidth: 120, maxWidth: 75 }} size="small">
-            <FormControl fullWidth>
-              <NativeSelect
-                defaultValue="public"
-                inputProps={{
-                  name: "age",
-                  id: "uncontrolled-native",
-                }}
-              >
-                <option value="public">Public</option>
-                <option value="popular">Popular</option>
-                <option value="best seller">Best Seller</option>
-              </NativeSelect>
-            </FormControl>
-          </Box>
-        </Sort>
-
-        <BodyArea>
-          <div className={styles.filterCol}>
-            <FilterArea>
-              <div className={styles.filterText}>
-                <p className={styles.filterTitle}>Filter</p>
-                <GrFilter />
-              </div>
-
-              <div className={styles.filterToggle}>
-                <BiMenuAltLeft />
-                {!filterOpen && (
-                  <MdArrowDropDown
-                    className={styles.arrow}
-                    onClick={filterToggleHandler}
-                  />
-                )}
-                {filterOpen && (
-                  <MdArrowDropUp
-                    className={styles.arrow}
-                    onClick={filterToggleHandler}
-                  />
-                )}
-              </div>
-
-              <Wrapper>
-                <div className="filter_open mobile-links" ref={toggleFilter}>
-                  {FILTER_OPTIONS.map((option) => (
-                    <FilterOption onClick={() => filterHandler(option)}>
-                      <div
-                        className={
-                          filters.includes(option) ? "selected" : "default"
-                        }
-                      >
-                        {option}
-                      </div>
-                    </FilterOption>
-                  ))}
-                </div>
-              </Wrapper>
-            </FilterArea>
-
-            <div>
-              <img alt="ad" src={ad} className={styles.ad} />
+    <>
+      {!isLoading && (
+        <div>
+          <div className={styles.cover}>
+            <div className={styles.coverText}>
+              <p className={styles.title}>{subCategoryName}</p>
+              <p className={styles.route}>
+                {categoryName} &gt; {subCategoryName}
+              </p>
             </div>
           </div>
 
-          <Page>
-            <ContentArea>
-              {/* {contentData.map((item) => (
-                <LongCard data={item} />
-              ))} */}
-            </ContentArea>
-            <div className={styles.paginationContainer}>
-              <p className={styles.pagiText}>
-                {currentPage} of {totalPages}
-              </p>
-              <AiOutlineLeftSquare
-                className={styles.pagiIcon}
-                onClick={prevPageHandler}
-              />
-              <AiOutlineRightSquare
-                className={styles.pagiIcon}
-                onClick={nextPageHandler}
-              />
-            </div>
-          </Page>
-        </BodyArea>
-      </Container>
-    </div>
+          <Container>
+            <Sort>
+              <p className={styles.sort}>Sort By: </p>
+
+              <Box sx={{ minWidth: 120, maxWidth: 75 }} size="small">
+                <FormControl fullWidth>
+                  <NativeSelect
+                    defaultValue="public"
+                    inputProps={{
+                      name: "age",
+                      id: "uncontrolled-native",
+                    }}
+                  >
+                    <option value="public">Public</option>
+                    <option value="popular">Popular</option>
+                    <option value="best seller">Best Seller</option>
+                  </NativeSelect>
+                </FormControl>
+              </Box>
+            </Sort>
+
+            <BodyArea>
+              <div className={styles.filterCol}>
+                <FilterArea>
+                  <div className={styles.filterText}>
+                    <p className={styles.filterTitle}>Filter</p>
+                    <GrFilter />
+                  </div>
+
+                  <div className={styles.filterToggle}>
+                    <BiMenuAltLeft />
+                    {!filterOpen && (
+                      <MdArrowDropDown
+                        className={styles.arrow}
+                        onClick={filterToggleHandler}
+                      />
+                    )}
+                    {filterOpen && (
+                      <MdArrowDropUp
+                        className={styles.arrow}
+                        onClick={filterToggleHandler}
+                      />
+                    )}
+                  </div>
+
+                  <Wrapper>
+                    <div
+                      className="filter_open mobile-links"
+                      ref={toggleFilter}
+                    >
+                      {genreDisplay &&
+                        genreDisplay.map((option) => (
+                          <FilterOption onClick={() => filterHandler(option)}>
+                            <div
+                              className={
+                                filters.includes(option)
+                                  ? "selected"
+                                  : "default"
+                              }
+                            >
+                              {option}
+                            </div>
+                          </FilterOption>
+                        ))}
+                    </div>
+                  </Wrapper>
+                </FilterArea>
+
+                <div>
+                  <img alt="ad" src={ad} className={styles.ad} />
+                </div>
+              </div>
+
+              <Page>
+                <ContentArea>
+                  {/* {contentData.length !== 0 &&
+                    contentData.content.map((item) => <LongCard data={item} />)} */}
+                  {displayedContent.map((data) =>
+                    data.content.map((item) => <LongCard data={item} />)
+                  )}
+
+                  {/* {contentData.length !== 0 &&
+                    contentData.map((item) => {
+                      {
+                        filters.length !== 0
+                          ? item.genre_name in filters &&
+                            item.content.map((items) => (
+                              <LongCard data={items} />
+                            ))
+                          : item.content.map((items) => (
+                              <LongCard data={items} />
+                            ));
+                      }
+                    })} */}
+                </ContentArea>
+                <div className={styles.paginationContainer}>
+                  <p className={styles.pagiText}>
+                    {currentPage} of {totalPages}
+                  </p>
+                  <AiOutlineLeftSquare
+                    className={styles.pagiIcon}
+                    onClick={prevPageHandler}
+                  />
+                  <AiOutlineRightSquare
+                    className={styles.pagiIcon}
+                    onClick={nextPageHandler}
+                  />
+                </div>
+              </Page>
+            </BodyArea>
+          </Container>
+        </div>
+      )}
+    </>
   );
 };
 

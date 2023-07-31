@@ -30,10 +30,14 @@ const LongCard = ({ data }) => {
           <p className={styles.des}>{data.summary}</p>
         </div>
 
-        <div className={styles.authorCon}>
-          {/* <hr /> */}
+        <Link className={styles.link} to={`/content/${data.id}`}>
+          <GreyBtn>Read More</GreyBtn>
+        </Link>
+
+        {/* <div className={styles.authorCon}>
+          <hr />
           <div className={styles.author_section}>
-            {/* <div className={styles.sec}>
+            <div className={styles.sec}>
               <div className={styles.details}>
                 <img className={styles.author_img} alt="" src={author_dp} />
                 <p className={styles.name}>Adnan Hasan</p>
@@ -47,13 +51,9 @@ const LongCard = ({ data }) => {
               {liked && (
                 <HiHeart className={styles.like} onClick={likeHandler} />
               )}
-            </div> */}
-
-            <Link className={styles.link} to={`/content/${data.id}`}>
-              <GreyBtn>Read More</GreyBtn>
-            </Link>
+            </div>
           </div>
-        </div>
+        </div> */}
       </div>
 
       <div className={styles.price}>Free</div>

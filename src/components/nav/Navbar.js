@@ -99,6 +99,7 @@ const Navbar = ({ menuItems }) => {
                   </>
                 ) : (
                   <div
+                    key={index}
                     className={styles.lit}
                     onMouseEnter={() => toggleDropdown(index, true)}
                     onMouseLeave={() => toggleDropdown(index, false)}

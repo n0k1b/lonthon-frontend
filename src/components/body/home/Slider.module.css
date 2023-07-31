@@ -37,3 +37,7 @@
   border: none;
   cursor: pointer;
 }
+
+.img {
+  width: 50px;
+}
