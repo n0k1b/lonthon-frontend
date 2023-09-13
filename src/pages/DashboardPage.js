@@ -10,6 +10,7 @@ import {
   CartesianGrid,
   Tooltip,
   Legend,
+  ResponsiveContainer,
 } from "recharts";
 import { Link, Navigate } from "react-router-dom";
 import { useDispatch, useSelector } from "react-redux";
@@ -117,6 +118,10 @@ const DashboardPage = () => {
               <Link className={styles.link} to="/dashboard/contents">
                 <p className={styles.options}>Contents</p>
               </Link>
+
+              <Link className={styles.link} to="/dashboard/withdraw">
+                <p className={styles.options}>Withdraw</p>
+              </Link>
             </div>
           </div>
 
@@ -148,24 +153,24 @@ const DashboardPage = () => {
 
               <div className={styles.graph}>
                 <p className={styles.graphTitle}>Income</p>
-                <BarChart
-                  width={600}
-                  height={300}
-                  data={DUMMY_DATA}
-                  margin={{
-                    top: 5,
-                    right: 30,
-                    left: 20,
-                    bottom: 5,
-                  }}
-                >
-                  <CartesianGrid strokeDasharray="3 3" />
-                  <XAxis dataKey="name" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Bar dataKey="value" fill="#6F6D6D" />
-                </BarChart>
+                <ResponsiveContainer width="100%" height={300}>
+                  <BarChart
+                    data={DUMMY_DATA}
+                    margin={{
+                      top: 5,
+                      right: 30,
+                      left: 0,
+                      bottom: 5,
+                    }}
+                  >
+                    <CartesianGrid strokeDasharray="3 3" />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip />
+                    <Legend />
+                    <Bar dataKey="value" fill="#6F6D6D" />
+                  </BarChart>
+                </ResponsiveContainer>
               </div>
             </div>
 

@@ -32,7 +32,7 @@ const style = {
   top: "50%",
   left: "50%",
   transform: "translate(-50%, -50%)",
-  width: 600,
+  width: "80%",
   bgcolor: "background.paper",
   border: "2px solid #000",
   boxShadow: 24,
@@ -650,6 +650,10 @@ const ProductsPage = () => {
 
               <Link className={styles.link} to="/dashboard/contents">
                 <p className={styles.active}>Contents</p>
+              </Link>
+
+              <Link className={styles.link} to="/dashboard/withdraw">
+                <p className={styles.options}>Withdraw</p>
               </Link>
             </div>
           </div>

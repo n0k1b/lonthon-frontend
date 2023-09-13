@@ -50,17 +50,6 @@ const HomePage = () => {
           <LiteratureSection data={item} />
         </div>
       ))}
-      {/* <div className={styles.content_container}>
-        <LiteratureSection />
-      </div>
-
-      <div className={styles.media_content_container}>
-        <MediaSection />
-      </div>
-
-      <div className={styles.media_content_container}>
-        <AudioSection />
-      </div> */}
 
       <div className={styles.about}>
         <p className={styles.about_title}>About Us</p>

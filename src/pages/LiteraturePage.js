@@ -226,8 +226,11 @@ const LiteraturePage = () => {
                       ref={toggleFilter}
                     >
                       {genreDisplay &&
-                        genreDisplay.map((option) => (
-                          <FilterOption onClick={() => filterHandler(option)}>
+                        genreDisplay.map((option, i) => (
+                          <FilterOption
+                            key={i}
+                            onClick={() => filterHandler(option)}
+                          >
                             <div
                               className={
                                 filters.includes(option)
@@ -250,26 +253,13 @@ const LiteraturePage = () => {
 
               <Page>
                 <ContentArea>
-                  {/* {contentData.length !== 0 &&
-                    contentData.content.map((item) => <LongCard data={item} />)} */}
                   {displayedContent.map((data) =>
-                    data.content.map((item) => <LongCard data={item} />)
+                    data.content.map((item, i) => (
+                      <LongCard key={i} data={item} />
+                    ))
                   )}
-
-                  {/* {contentData.length !== 0 &&
-                    contentData.map((item) => {
-                      {
-                        filters.length !== 0
-                          ? item.genre_name in filters &&
-                            item.content.map((items) => (
-                              <LongCard data={items} />
-                            ))
-                          : item.content.map((items) => (
-                              <LongCard data={items} />
-                            ));
-                      }
-                    })} */}
                 </ContentArea>
+
                 <div className={styles.paginationContainer}>
                   <p className={styles.pagiText}>
                     {currentPage} of {totalPages}

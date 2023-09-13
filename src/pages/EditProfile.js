@@ -47,6 +47,10 @@ const EditProfile = () => {
           <Link className={styles.link} to="/dashboard/products">
             <p className={styles.options}>Products</p>
           </Link>
+
+          <Link className={styles.link} to="/dashboard/withdraw">
+            <p className={styles.options}>Withdraw</p>
+          </Link>
         </div>
       </div>
 

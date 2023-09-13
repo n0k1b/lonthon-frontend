@@ -19,6 +19,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
 import LoginPage from "./pages/LoginPage";
 import Signup from "./pages/Signup";
+import WithdrawPage from "./pages/WithdrawPage";
 
 function App() {
   const dispatch = useDispatch();
@@ -127,6 +128,8 @@ function App() {
                 />
 
                 <Route path="/dashboard/contents" element={<ProductsPage />} />
+
+                <Route path="/dashboard/withdraw" element={<WithdrawPage />} />
 
                 <Route path="/content/:id" element={<ProductDetails />} />
 
