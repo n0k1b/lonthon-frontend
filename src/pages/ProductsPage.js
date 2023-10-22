@@ -22,10 +22,6 @@ import Box from "@mui/material/Box";
 import { homepageActions } from "../redux/homepage-slice";
 
 import Modal from "@mui/material/Modal";
-import g1 from "../image/g1.jpg";
-import g2 from "../image/g2.jpg";
-import g3 from "../image/g3.jpg";
-import g4 from "../image/g4.jpg";
 
 const style = {
   position: "absolute",
@@ -38,8 +34,6 @@ const style = {
   boxShadow: 24,
   p: 4,
 };
-
-const DUMMY_IMAGE = [g1, g2, g3, g4];
 
 const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
@@ -872,7 +866,7 @@ const ProductsPage = () => {
                       <option value={"2"}>Negotiation</option>
                     </select>
 
-                    {type === 1 && (
+                    {type === "1" && (
                       <div>
                         <p className={classes.formTitle}>Price*</p>
                         <input

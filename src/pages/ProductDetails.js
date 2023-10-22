@@ -124,14 +124,14 @@ const ProductDetails = () => {
                     </div>
 
                     <div>
-                      <select className={styles.filterOp} name="download">
+                      {/* <select className={styles.filterOp} name="download">
                         <option value="" disabled selected>
                           Download With
                         </option>
                         <option value="PDF">PDF</option>
                         <option value="JPG">JPG</option>
                         <option value="PHP">PHP</option>
-                      </select>
+                      </select> */}
                     </div>
                   </div>
                   <img
