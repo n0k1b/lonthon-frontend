@@ -22,7 +22,7 @@ import Box from "@mui/material/Box";
 import { homepageActions } from "../redux/homepage-slice";
 
 import Modal from "@mui/material/Modal";
-
+import axios from 'axios';
 const style = {
   position: "absolute",
   top: "50%",
@@ -232,11 +232,10 @@ const ProductsPage = () => {
 
     const reader = new FileReader();
     reader.onload = () => {
-      // const base64Code = reader.result.split(",")[1];
-      // setPdfFile(base64Code);
-      setPdfFile(reader.result);
+      // Use the raw file (not base64 encoded)
+      setPdfFile(file);
     };
-    reader.readAsDataURL(file);
+    reader.readAsArrayBuffer(file); // or reader.readAsBinaryString(file) depending on your needs
   };
 
   const uploadHandler = () => {
@@ -374,94 +373,12 @@ const ProductsPage = () => {
     }
   }, [modalBanOpen]);
 
-  //Post Data
-  // const postDataHandler = async () => {
-  //   let content = "";
-  //   let cType = "";
 
-  //   if (addPdf) content = pdfFile;
-  //   if (addText) content = textContent;
-  //   if (addImage) content = image;
-  //   if (addVideo) content = videoFile;
-
-  //   if (addImage) cType = 0;
-  //   if (addPdf) cType = 1;
-  //   if (addText) cType = 2;
-  //   if (addVideo) cType = 4;
-
-  //   if (
-  //     title &&
-  //     thumbImg &&
-  //     banImg &&
-  //     description &&
-  //     author &&
-  //     selectedCategory &&
-  //     selectedSubCategory &&
-  //     selectedGenre
-  //   ) {
-  //     dispatch(homepageActions.setIsLoading(true));
-  //     const data = {
-  //       title: title,
-  //       category_id: selectedCategory,
-  //       sub_category_id: selectedSubCategory,
-  //       genre_id: selectedGenre,
-  //       thumbnail_image: thumbImg,
-  //       feature_image: banImg,
-  //       summary: description,
-  //       author: author,
-  //       type: 0,
-  //       content_type: cType,
-  //       content: addText ? textContent : content,
-  //     };
-
-  //     console.log(data);
-
-  //     try {
-  //       console.log("start");
-  //       const response = await fetch(`${baseURL}/content-upload`, {
-  //         method: "POST",
-  //         headers: {
-  //           "Content-Type": "application/json",
-  //           Authorization: `Bearer ${token}`,
-  //         },
-  //         body: JSON.stringify(data),
-  //       });
-
-  //       console.log("response:", response);
-
-  //       if (!response.ok) {
-  //         throw new Error("Request failed");
-  //       }
-
-  //       const data2 = await response.json();
-  //       console.log("Data:", data2);
-
-  //       setSubmitMsg(data2.message);
-  //       setSubmittedPopUp(true);
-  //     } catch (error) {
-  //       console.error("Error:", error);
-  //       console.log("Error");
-  //     }
-  //   } else {
-  //     setFormFillUpError(true);
-
-  //     if (!title) setTitleError(true);
-  //     if (!description) setDesError(true);
-  //     if (author.length === 0) setAuthorError(true);
-
-  //     if (title) setTitleError(false);
-  //     if (description) setDesError(false);
-  //     if (author.length !== 0) setAuthorError(false);
-  //   }
-  //   dispatch(homepageActions.setIsLoading(false));
-  //   setTimeout(() => {
-  //     goBackHandler();
-  //   }, 3000);
-  // };
 
   const postDataHandler = async () => {
     let content;
     let cType = "";
+
 
     if (addPdf) {
       content = pdfFile;
@@ -492,52 +409,53 @@ const ProductsPage = () => {
       type
     ) {
       dispatch(homepageActions.setIsLoading(true));
-
-      const data = new FormData();
-      data.append("title", title);
-      data.append("category_id", selectedCategory);
-      data.append("sub_category_id", selectedSubCategory);
-      data.append("genre_id", selectedGenre);
-      data.append("thumbnail_image", thumbImg);
-      data.append("feature_image", banImg);
-      data.append("summary", description);
-      data.append("author", author);
-      data.append("type", 0);
-      data.append("content_type", cType);
-      for (let i = 0; i < content.length; i++) {
-        data.append("content[]", content[i]);
+      const formData = new FormData();
+      formData.append("title", title);
+      formData.append("category_id", selectedCategory);
+      formData.append("sub_category_id", selectedSubCategory);
+      formData.append("genre_id", selectedGenre);
+      formData.append("thumbnail_image", thumbImg);
+      formData.append("feature_image", banImg);
+      formData.append("summary", description);
+      formData.append("author", author);
+      formData.append("type", 0);
+      formData.append("content_type", cType);
+      if(cType==0){
+        for (let i = 0; i < content.length; i++) {
+          formData.append("content[]", content);
+        }
       }
-      type === 1 ? data.append("price", price) : data.append("price", 0);
+      else if(cType==1 || cType==4) {
+        formData.append("content", content);
+      }
+
+      type === 1 ? formData.append("price", price) : formData.append("price", 0);
 
       try {
-        console.log("start");
-        const response = await fetch(`${baseURL}/content-upload`, {
-          method: "POST",
+        const response = await axios.post(`${baseURL}/content-upload`, formData, {
           headers: {
             Authorization: `Bearer ${token}`,
+            'Content-Type': 'multipart/form-data',
           },
-          body: data,
         });
 
-        console.log("response:", response);
+        console.log("Response Data:", response.data);
 
-        if (!response.ok) {
-          throw new Error("Request failed");
+        if (!response.data.success) {
+          throw new Error(response.data.message);
         }
 
-        const data2 = await response.json();
-        console.log("Data:", data2);
-
-        setSubmitMsg(data2.message);
+        setSubmitMsg(response.data.message);
         setSubmittedPopUp(true);
+        setTimeout(() => {
+          goBackHandler();
+        }, 3000);
       } catch (error) {
-        console.error("Error:", error);
-        console.log("Error");
+        console.error("Error:", error.message);
+        setSubmittedPopUp(true);
+      } finally {
+        dispatch(homepageActions.setIsLoading(false));
       }
-      setSubmittedPopUp(true);
-      setTimeout(() => {
-        goBackHandler();
-      }, 3000);
     } else {
       setFormFillUpError(true);
       console.log([
@@ -562,7 +480,6 @@ const ProductsPage = () => {
       if (author.length !== 0) setAuthorError(false);
       if (price) setPriceError(false);
     }
-    dispatch(homepageActions.setIsLoading(false));
   };
 
   const goBackHandler = () => {

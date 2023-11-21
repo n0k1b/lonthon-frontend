@@ -160,7 +160,7 @@ const ProductDetails = () => {
                       {content.media_type === 1 && (
                         <div className={styles.pdfCon}>
                           <Document
-                            file={`data:application/pdf;base64,${content.media[0].media_url}`}
+                            file={`data:application/pdf;base64,${content.media[0].pdf_url}`}
                             onLoadSuccess={onDocumentLoadSuccess}
                             onLoadError={console.error}
                           >
