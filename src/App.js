@@ -133,6 +133,8 @@ function App() {
 
                 <Route path="/content/:id" element={<ProductDetails />} />
 
+                {/* <Route path="/content/edit/:id" element={<ProductDetails />} /> */}
+
                 <Route path="/login" element={<LoginPage />} />
 
                 <Route path="/signup" element={<Signup />} />

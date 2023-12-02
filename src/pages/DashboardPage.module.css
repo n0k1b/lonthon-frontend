@@ -175,6 +175,9 @@
 .link {
   text-decoration: none;
 }
+.p10{
+  padding: 10px
+}
 
 @media screen and (max-width: 730px) {
   .container {
