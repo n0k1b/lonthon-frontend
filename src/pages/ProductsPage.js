@@ -198,7 +198,7 @@ const ProductsPage = () => {
   const columns = [
     {
       name: "Content ID",
-      selector: (row) => row.id,
+      selector: (row, i) => i + 1,
     },
     {
       name: "Title",
@@ -248,10 +248,12 @@ const ProductsPage = () => {
     };
     reader.readAsArrayBuffer(file); // or reader.readAsBinaryString(file) depending on your needs
   };
-  const handleEdit = (id) => {
-    
-    categoryFetch();
-    contentSingleDataFetch(id);
+
+  const handleEdit = async (id) => {
+    setLoading(true);
+    await categoryFetch();
+    await contentSingleDataFetch(id);
+    setLoading(false);
     setEditUI(true);
   };
 
@@ -302,21 +304,19 @@ const ProductsPage = () => {
   };
   //Data Fetch
   const contentSingleDataFetch = async (id) => {
-    // const response = await fetch(`${baseURL}/content-edit/${id}`);
+    const response = await fetch(`${baseURL}/content/${id}`);
 
-    // if (!response.ok) return;
+    if (!response.ok) return;
 
-    // const data = await response.json();
-    // console.log(data);
-    SetContentSingleData({
-        title: "Sample Title 1",
-        des:"this is des for the demo ",
-        authorName: "Author Name 1",
-        price: 100,
-        addThumbnail: true,
-        addBanner: false
-    });
-    console.log(contentSingleData)
+    const data = await response.json();
+    console.log(data);
+    SetContentSingleData(data.data);
+
+    setSelectedCategory(data.data.category_id);
+    setSelectedSubCategory(data.data.subcategory_id);
+    setSelectedGenre(data.data.genre_id);
+    setThumbImgDisplay(data.data.thumbnail_image)
+    console.log(data.data);
   };
 
   const subcategoryFetch = async () => {
@@ -1119,7 +1119,11 @@ const ProductsPage = () => {
                       Select Category
                     </option>
                     {categoryData.map((op, i) => (
-                      <option key={i} value={op.id}>
+                      <option
+                        key={i}
+                        value={op.id}
+                        selected={op.id == selectedCategory ? true : false}
+                      >
                         {op.name}
                       </option>
                     ))}
@@ -1127,6 +1131,7 @@ const ProductsPage = () => {
 
                   {selectedCategory && (
                     <select
+                      // value={contentSingleData.subcategory_id}
                       className={classes.filterOp}
                       name="filter"
                       onChange={handleSubCatSelect}
@@ -1135,7 +1140,11 @@ const ProductsPage = () => {
                         Select Sub Category
                       </option>
                       {subcategoryData.map((op, i) => (
-                        <option key={i} value={op.id}>
+                        <option
+                          key={i}
+                          value={op.id}
+                          selected={op.id == selectedSubCategory ? true : false}
+                        >
                           {op.name}
                         </option>
                       ))}
@@ -1144,6 +1153,7 @@ const ProductsPage = () => {
 
                   {selectedSubCategory && (
                     <select
+                      // value={contentSingleData.genre_id}
                       className={classes.filterOp}
                       name="filter"
                       onClick={handleGenreSelect}
@@ -1152,7 +1162,11 @@ const ProductsPage = () => {
                         Genre
                       </option>
                       {genreData.map((op, i) => (
-                        <option key={i} value={op.id}>
+                        <option
+                          key={i}
+                          value={op.id}
+                          selected={op.id == selectedGenre ? true : false}
+                        >
                           {op.name}
                         </option>
                       ))}
@@ -1182,6 +1196,7 @@ const ProductsPage = () => {
                       onChange={(e) => {
                         setDescription(e.target.value);
                       }}
+                      value={contentSingleData.summary}
                     />
                     {desError && (
                       <p className={classes.errorTxt}>
@@ -1210,7 +1225,7 @@ const ProductsPage = () => {
                         <input
                           className={classes.inputText}
                           type="text"
-                          defaultValue={contentSingleData.des}
+                          defaultValue={contentSingleData.author}
                           onChange={(e) => {
                             const updatedAuthors = [...author];
                             updatedAuthors[index] = e.target.value;
@@ -1239,9 +1254,24 @@ const ProductsPage = () => {
                       <option value="" disabled selected>
                         Select Type
                       </option>
-                      <option value={"0"}>Free</option>
-                      <option value={"1"}>Paid</option>
-                      <option value={"2"}>Negotiation</option>
+                      <option
+                        selected={contentSingleData.type == 0 ? true : false}
+                        value={"0"}
+                      >
+                        Free
+                      </option>
+                      <option
+                        selected={contentSingleData.type == 1 ? true : false}
+                        value={"1"}
+                      >
+                        Paid
+                      </option>
+                      <option
+                        selected={contentSingleData.type == 2 ? true : false}
+                        value={"2"}
+                      >
+                        Negotiation
+                      </option>
                     </select>
 
                     {type === "1" && (
