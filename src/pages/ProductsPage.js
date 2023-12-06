@@ -65,6 +65,7 @@ const ProductsPage = () => {
 
   const [thumbImgDisplay, setThumbImgDisplay] = useState(null);
   const [banImgDisplay, setBanImgDisplay] = useState(null);
+  const [selectedPdfName, setSelectedPdfName] = useState("");
 
   const [num, setNum] = useState(1);
   const [authorNum, setAuthorNum] = useState([1]);
@@ -91,7 +92,7 @@ const ProductsPage = () => {
   const [priceError, setPriceError] = useState(false);
 
   const [editUI, setEditUI] = useState(false);
-  const [contentSingleData, SetContentSingleData] = useState();
+  const [contentSingleData, setContentSingleData] = useState();
 
   const [loading, setLoading] = useState(false);
   const [dashboardData, setDashboardData] = useState();
@@ -240,7 +241,7 @@ const ProductsPage = () => {
 
   const handlePDFInputChange = (event) => {
     const file = event.target.files[0];
-
+    setSelectedPdfName(file.name);
     const reader = new FileReader();
     reader.onload = () => {
       // Use the raw file (not base64 encoded)
@@ -310,12 +311,13 @@ const ProductsPage = () => {
 
     const data = await response.json();
     console.log(data);
-    SetContentSingleData(data.data);
+    setContentSingleData(data.data);
 
     setSelectedCategory(data.data.category_id);
     setSelectedSubCategory(data.data.subcategory_id);
     setSelectedGenre(data.data.genre_id);
-    setThumbImgDisplay(data.data.thumbnail_image)
+    setThumbImgDisplay(data.data.thumbnail_image);
+    setBanImgDisplay(data.data.feature_image);
     console.log(data.data);
   };
 
@@ -967,6 +969,9 @@ const ProductsPage = () => {
                           hidden
                           onChange={handlePDFInputChange}
                         />
+                        {selectedPdfName && (
+                          <p>{selectedPdfName}</p>
+                        )}
                       </div>
                     )}
                     {addVideo && (
@@ -1420,6 +1425,9 @@ const ProductsPage = () => {
                           hidden
                           onChange={handlePDFInputChange}
                         />
+                        {selectedPdfName && (
+                          <p>{selectedPdfName}</p>
+                        )}
                       </div>
                     )}
                     {addVideo && (
@@ -1453,7 +1461,7 @@ const ProductsPage = () => {
                   </div>
                   <div className={classes.TBSec}>
                     <p className={classes.formTitle}>Add Thumbnail</p>
-                    {!thumbImg && (
+                    {!thumbImg && !thumbImgDisplay && (
                       <div className={classes.thumbImgSelectCon}>
                         <div
                           className={classes.uploadImg}
@@ -1479,7 +1487,7 @@ const ProductsPage = () => {
                       onChange={handleImageChangeThumb}
                     />
 
-                    {thumbImg && (
+                    {thumbImgDisplay && (
                       <div className={classes.imagePrevCon}>
                         <img
                           className={classes.previewImg}
@@ -1493,6 +1501,7 @@ const ProductsPage = () => {
                           className={classes.imagePrevRem}
                           onClick={() => {
                             document.querySelector("#thumbImgRem").click();
+                            setThumbImgDisplay();
                           }}
                         >
                           Click to Remove
@@ -1502,7 +1511,7 @@ const ProductsPage = () => {
 
                     <p className={classes.formTitle}>Add Banner</p>
 
-                    {!banImg && (
+                    {(!banImg && !banImgDisplay) && (
                       <div className={classes.thumbImgSelectCon}>
                         <div
                           className={classes.uploadImgBan}
@@ -1527,7 +1536,7 @@ const ProductsPage = () => {
                       hidden
                       onChange={handleImageChangeBan}
                     />
-                    {banImg && (
+                    {banImgDisplay && (
                       <div className={classes.imagePrevCon}>
                         <img
                           className={classes.previewImg}
