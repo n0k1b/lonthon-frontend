@@ -189,6 +189,10 @@ const WithdrawPage = () => {
               <Link className={styles.link} to="/dashboard/withdraw">
                 <p className={styles.active}>Withdraw</p>
               </Link>
+
+              <Link className={styles.link} to="/dashboard/purchase">
+                <p className={styles.options}>Purchase</p>
+              </Link>
             </div>
           </div>
 

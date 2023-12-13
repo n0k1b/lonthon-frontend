@@ -9,7 +9,7 @@ import addBtn from "../image/addBtn.png";
 import addBtn2 from "../image/addBtn2.png";
 import dp from "../image/dp.jpg";
 import styles from "./DashboardPage.module.css";
-import classes from "./ProductsPage.module.css";
+import classes from "./PurchasePage.module.css";
 
 import { Editor } from "@tinymce/tinymce-react";
 
@@ -39,7 +39,7 @@ const Alert = React.forwardRef(function Alert(props, ref) {
   return <MuiAlert elevation={6} ref={ref} variant="filled" {...props} />;
 });
 
-const ProductsPage = () => {
+const PurchasePage = () => {
   const isLoading = useSelector((state) => state.homepage.isLoading);
   const isLoggedIn = useSelector((state) => state.homepage.isLoggedIn);
   const token = useSelector((state) => state.homepage.token);
@@ -221,12 +221,12 @@ const ProductsPage = () => {
           <Link className={styles.link} to={`/content/${row.id}`}>
             <GreyBtn>Details</GreyBtn>
           </Link>
-          <div
+          {/* <div
             className={`${styles.link} ${styles.p10}`}
             onClick={() => handleEdit(row.id)}
           >
             <GreyBtn>Edit</GreyBtn>
-          </div>
+          </div> */}
         </>
       ),
     },
@@ -782,7 +782,7 @@ const ProductsPage = () => {
               </Link>
 
               <Link className={styles.link} to="/dashboard/contents">
-                <p className={styles.active}>Contents</p>
+                <p className={styles.options}>Contents</p>
               </Link>
 
               <Link className={styles.link} to="/dashboard/withdraw">
@@ -790,7 +790,7 @@ const ProductsPage = () => {
               </Link>
 
               <Link className={styles.link} to="/dashboard/purchase">
-                <p className={styles.options}>Purchase</p>
+                <p className={styles.active}>Purchase</p>
               </Link>
             </div>
           </div>
@@ -810,9 +810,9 @@ const ProductsPage = () => {
           <div className={classes.rightCon}>
             {!editUI && !upload && (
               <div className={classes.rContainer}>
-                <p className={classes.pTitle}>Contents</p>
+                <p className={classes.pTitle}>Purchase</p>
 
-                <div className={classes.filterContainer}>
+                {/* <div className={classes.filterContainer}>
                   <select className={classes.filterOp} name="filter">
                     <option value="" disabled selected>
                       Select Category
@@ -845,7 +845,7 @@ const ProductsPage = () => {
                   src={addBtn}
                   className={classes.addBtn}
                   onClick={uploadHandler}
-                />
+                /> */}
 
                 <div className={classes.tableCon}>
                   <DataTable
@@ -1842,4 +1842,4 @@ const ProductsPage = () => {
     </>
   );
 };
-export default ProductsPage;
+export default PurchasePage;

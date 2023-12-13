@@ -12,7 +12,6 @@ import { Helmet } from "react-helmet";
 import ScrollToTop from "./ScrollToTop";
 import DashboardPage from "./pages/DashboardPage";
 import EditProfile from "./pages/EditProfile";
-import ProductsPage from "./pages/ProductsPage";
 import ProductDetails from "./pages/ProductDetails";
 
 import CircularProgress from "@mui/material/CircularProgress";
@@ -20,6 +19,8 @@ import Box from "@mui/material/Box";
 import LoginPage from "./pages/LoginPage";
 import Signup from "./pages/Signup";
 import WithdrawPage from "./pages/WithdrawPage";
+import ProductsPage from "./pages/ProductsPage";
+import PurchasePage from "./pages/PurchasePage";
 
 function App() {
   const dispatch = useDispatch();
@@ -128,6 +129,8 @@ function App() {
                 />
 
                 <Route path="/dashboard/contents" element={<ProductsPage />} />
+
+                <Route path="/dashboard/purchase" element={<PurchasePage />} />
 
                 <Route path="/dashboard/withdraw" element={<WithdrawPage />} />
 
