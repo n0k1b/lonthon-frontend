@@ -52,6 +52,7 @@ const ProductsPage = () => {
   const [addImg, setAddImg] = useState(false);
 
   const [pdfFile, setPdfFile] = useState(null);
+  const [contentID, setContentID] = useState("");
   const [thumbImg, setThumbImg] = useState(null);
   const [banImg, setBanImg] = useState(null);
   const [textContent, setTextContent] = useState("");
@@ -238,10 +239,17 @@ const ProductsPage = () => {
     }
     postDataHandler();
   };
+  const updateLog = () => {
+    if (editorRef.current) {
+      setTextContent(editorRef.current.getContent());
+    }
+    updateDataHandler();
+  };
 
   const handlePDFInputChange = (event) => {
     const file = event.target.files[0];
     setSelectedPdfName(file.name);
+    console.log(file);
     const reader = new FileReader();
     reader.onload = () => {
       // Use the raw file (not base64 encoded)
@@ -305,6 +313,7 @@ const ProductsPage = () => {
   };
   //Data Fetch
   const contentSingleDataFetch = async (id) => {
+    setContentID(id);
     const response = await fetch(`${baseURL}/content/${id}`);
 
     if (!response.ok) return;
@@ -312,13 +321,64 @@ const ProductsPage = () => {
     const data = await response.json();
     console.log(data);
     setContentSingleData(data.data);
+    const {
+      title,
+      thumbnail_image,
+      feature_image,
+      summary,
+      author,
+      category_id,
+      subcategory_id,
+      genre_id,
+      type,
+      media_type,
+      price
+    } = data.data;
 
-    setSelectedCategory(data.data.category_id);
-    setSelectedSubCategory(data.data.subcategory_id);
-    setSelectedGenre(data.data.genre_id);
-    setThumbImgDisplay(data.data.thumbnail_image);
-    setBanImgDisplay(data.data.feature_image);
     console.log(data.data);
+    if (media_type == 1) {
+      clearContentHandler();
+      setSelectedPdfName('file.pdf')
+      setPdfFile(data.data.media[0].pdf_url)
+      setAddPdf(true);
+      setAddImage(false);
+      setAddText(false);
+      setAddVideo(false);
+    }
+    if (media_type == 2) {
+      clearContentHandler();
+      setAddPdf(false);
+      setAddImage(false);
+      setAddText(true);
+      setAddVideo(false);
+    }
+    if (media_type == 0) {
+      clearContentHandler();
+      setAddPdf(false);
+      setAddImage(true);
+      setAddText(false);
+      setAddVideo(false);
+    }
+    if (media_type == 4) {
+      clearContentHandler();
+      setAddPdf(false);
+      setAddImage(false);
+      setAddText(false);
+      setAddVideo(true);
+    }
+
+    setTitle(title);
+    setPrice(type == 1 ? price : 0)
+    setThumbImg(thumbnail_image);
+    setBanImg(feature_image);
+    setDescription(summary);
+    setAuthor(author);
+    setSelectedCategory(category_id);
+    setSelectedSubCategory(subcategory_id);
+    setSelectedGenre(genre_id);
+    setThumbImgDisplay(thumbnail_image);
+    setBanImgDisplay(feature_image);
+    setType(type);
   };
 
   const subcategoryFetch = async () => {
@@ -454,6 +514,7 @@ const ProductsPage = () => {
       formData.append("author", author);
       formData.append("type", 0);
       formData.append("content_type", cType);
+      console.log({content});
       if (cType == 0) {
         for (let i = 0; i < content.length; i++) {
           formData.append("content[]", content);
@@ -497,8 +558,8 @@ const ProductsPage = () => {
       }
     } else {
       setFormFillUpError(true);
-      console.log([
-        title,
+      console.log(
+        {title,
         thumbImg,
         banImg,
         description,
@@ -507,7 +568,127 @@ const ProductsPage = () => {
         selectedSubCategory,
         selectedGenre,
         type,
-      ]);
+        price,
+        cType,
+        content
+      });
+
+      if (!title) setTitleError(true);
+      if (!description) setDesError(true);
+      if (author.length === 0) setAuthorError(true);
+      if (type === 2 && !price) setPriceError(true);
+
+      if (title) setTitleError(false);
+      if (description) setDesError(false);
+      if (author.length !== 0) setAuthorError(false);
+      if (price) setPriceError(false);
+    }
+  };
+  const updateDataHandler = async () => {
+    let content;
+    let cType = "";
+
+    if (addPdf) {
+      content = pdfFile;
+      cType = 1;
+    }
+    if (addText) {
+      content = textContent;
+      cType = 2;
+    }
+    if (addImage) {
+      content = image;
+      cType = 0;
+    }
+    if (addVideo) {
+      content = videoFile;
+      cType = 4;
+    }
+
+    if (
+      title &&
+      thumbImg &&
+      banImg &&
+      description &&
+      author &&
+      selectedCategory &&
+      selectedSubCategory &&
+      selectedGenre &&
+      type
+    ) {
+      dispatch(homepageActions.setIsLoading(true));
+      const formData = new FormData();
+      formData.append("title", title);
+      formData.append("category_id", selectedCategory);
+      formData.append("sub_category_id", selectedSubCategory);
+      formData.append("genre_id", selectedGenre);
+      formData.append("thumbnail_image", thumbImg);
+      formData.append("feature_image", banImg);
+      formData.append("summary", description);
+      formData.append("author", author);
+      formData.append("type", 0);
+      formData.append("content_type", cType);
+      console.log({content});
+      if (cType == 0) {
+        for (let i = 0; i < content.length; i++) {
+          formData.append("content[]", content);
+        }
+      } else if (cType == 1 || cType == 4) {
+        formData.append("content", content);
+      }
+
+      type === 1
+        ? formData.append("price", price)
+        : formData.append("price", 0);
+      
+        
+
+        
+      try {
+        const response = await axios.post(
+          `${baseURL}/content-update/${contentID}`,
+          formData,
+          {
+            headers: {
+              // Authorization: `Bearer ${token}`,
+              'Content-Type': 'application/json'
+            },
+          }
+        );
+
+        console.log("Response Data:", response.data);
+
+        if (!response.data.success) {
+          throw new Error(response.data.message);
+        }
+
+        setSubmitMsg(response.data.message);
+        setSubmittedPopUp(true);
+        setTimeout(() => {
+          goBackHandler();
+        }, 3000);
+      } catch (error) {
+        console.error("Error:", error.message);
+        setSubmittedPopUp(true);
+      } finally {
+        dispatch(homepageActions.setIsLoading(false));
+      }
+    } else {
+      setFormFillUpError(true);
+      console.log(
+        {title,
+        thumbImg,
+        banImg,
+        description,
+        author,
+        selectedCategory,
+        selectedSubCategory,
+        selectedGenre,
+        type,
+        price,
+        cType,
+        content
+      });
 
       if (!title) setTitleError(true);
       if (!description) setDesError(true);
@@ -969,9 +1150,7 @@ const ProductsPage = () => {
                           hidden
                           onChange={handlePDFInputChange}
                         />
-                        {selectedPdfName && (
-                          <p>{selectedPdfName}</p>
-                        )}
+                        {selectedPdfName && <p>{selectedPdfName}</p>}
                       </div>
                     )}
                     {addVideo && (
@@ -1201,7 +1380,7 @@ const ProductsPage = () => {
                       onChange={(e) => {
                         setDescription(e.target.value);
                       }}
-                      value={contentSingleData.summary}
+                      defaultValue={contentSingleData.summary}
                     />
                     {desError && (
                       <p className={classes.errorTxt}>
@@ -1279,16 +1458,16 @@ const ProductsPage = () => {
                       </option>
                     </select>
 
-                    {type === "1" && (
+                    {type == "1" && (
                       <div>
                         <p className={classes.formTitle}>Price*</p>
                         <input
-                          defaultValue={contentSingleData.price}
                           className={classes.inputText}
                           type="number"
                           onChange={(e) => {
                             setPrice(parseInt(e.target.value));
                           }}
+                          defaultValue={price}
                         />
                         {priceError && (
                           <p className={classes.errorTxt}>
@@ -1425,9 +1604,7 @@ const ProductsPage = () => {
                           hidden
                           onChange={handlePDFInputChange}
                         />
-                        {selectedPdfName && (
-                          <p>{selectedPdfName}</p>
-                        )}
+                        {selectedPdfName && <p>{selectedPdfName}</p>}
                       </div>
                     )}
                     {addVideo && (
@@ -1511,7 +1688,7 @@ const ProductsPage = () => {
 
                     <p className={classes.formTitle}>Add Banner</p>
 
-                    {(!banImg && !banImgDisplay) && (
+                    {!banImg && !banImgDisplay && (
                       <div className={classes.thumbImgSelectCon}>
                         <div
                           className={classes.uploadImgBan}
@@ -1542,7 +1719,7 @@ const ProductsPage = () => {
                           className={classes.previewImg}
                           src={banImgDisplay}
                           onClick={() => {
-                            setBanImg(null);
+                            setBanImg(null)
                           }}
                           id="banImgRem"
                         />
@@ -1550,6 +1727,7 @@ const ProductsPage = () => {
                           className={classes.imagePrevRem}
                           onClick={() => {
                             document.querySelector("#banImgRem").click();
+                            setBanImgDisplay(null);
                           }}
                         >
                           Click to Remove
@@ -1557,7 +1735,7 @@ const ProductsPage = () => {
                       </div>
                     )}
                   </div>
-                  <div className={classes.saveBtn} onClick={log}>
+                  <div className={classes.saveBtn} onClick={updateLog}>
                     <GreyBtn>Update</GreyBtn>
                   </div>
                 </div>
