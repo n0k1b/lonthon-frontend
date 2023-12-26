@@ -1,3 +1,47 @@
+.part2Content {
+  position: relative;
+}
+
+.blurOverlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1;
+}
+
+.payButton {
+  position: relative; /* Ensure the button stays above the overlay */
+  z-index: 2;
+}
+
+.centeredDiv {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  text-align: center;
+  z-index: 2;
+}
+
+.payNowButton {
+  padding: 10px 20px;
+  font-size: 18px;
+  background-color: #4CAF50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.helperText {
+  font-size: 16px;
+  color: white;
+  margin-top: 10px;
+}
+
 .cover {
   height: 150px;
   padding: 30px 7vw;

@@ -1,7 +1,8 @@
 import React, { useEffect, useState } from "react";
 import styles from "./ProductDetails.module.css";
 import Slider from "react-slick";
-
+import axios from 'axios';
+import { useDispatch, useSelector } from "react-redux";
 import author_dp from "../image/author_dp.jpg";
 import product_banner from "../image/product_banner.png";
 import text_image from "../image/text_image.jpg";
@@ -10,7 +11,7 @@ import {
   BsFillArrowRightCircleFill,
 } from "react-icons/bs";
 
-import { useParams } from "react-router-dom";
+import { useParams, Navigate } from "react-router-dom";
 import { baseURL } from "../api";
 
 import CircularProgress from "@mui/material/CircularProgress";
@@ -21,11 +22,12 @@ pdfjs.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pd
 
 const ProductDetails = () => {
   const params = useParams();
-  console.log(params.id);
+
 
   const [loading, setLoading] = useState(true);
   const [content, setContent] = useState();
-
+  const isLoggedIn = useSelector((state) => state.homepage.isLoggedIn);
+  const token = useSelector((state) => state.homepage.token);
   const settings = {
     dots: true,
     infinite: false,
@@ -57,11 +59,12 @@ const ProductDetails = () => {
     }
   };
 
+
   //Fetch Data
   const dataFetch = async () => {
     setLoading(true);
     const response = await fetch(`${baseURL}/content/${parseInt(params.id)}`);
-    console.log(response);
+
 
     if (!response.ok) return;
 
@@ -70,6 +73,44 @@ const ProductDetails = () => {
     setContent(data.data);
     setLoading(false);
   };
+  const handlePayment = async (contentId) => {
+    if (!isLoggedIn) {
+
+      window.location.href = '/login';
+      return;
+    }
+    try {
+      const response = await axios.post(
+        `${baseURL}/initiate-payment`,
+        {
+          contentId: contentId,
+        },
+        {
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${token}`,
+          },
+        }
+      );
+
+      const data = response.data;
+      console.log(data);
+
+
+      if (data.status) {
+
+        window.location.href = data.data.redirectUrl;
+      } else {
+
+        console.error('Failed to initiate payment');
+      }
+    } catch (error) {
+      console.log('test');
+      console.error('Error:', error);
+    }
+  };
+
+
 
   useEffect(() => {
     try {
@@ -100,8 +141,8 @@ const ProductDetails = () => {
           <div>
             <div className={styles.cover}>
               <div className={styles.coverText}>
-                <p className={styles.title}>Novel</p>
-                <p className={styles.route}>Literature &gt; Novel</p>
+                <p className={styles.title}>{content.sub_category.name}</p>
+                <p className={styles.route}>{content.category.name} &gt; {content.sub_category.name}</p>
               </div>
             </div>
 
@@ -124,6 +165,9 @@ const ProductDetails = () => {
                     </div>
 
                     <div>
+                    <div style={{ backgroundColor: 'white', padding: '10px', borderRadius: '5px' }}>
+  <p style={{ fontWeight:'bold',  fontSize: '20px'}}>Price: <span style={{ fontWeight: 'bold', color: 'green' }}>{content.price} BDT</span></p>
+</div>
                       {/* <select className={styles.filterOp} name="download">
                         <option value="" disabled selected>
                           Download With
@@ -141,58 +185,82 @@ const ProductDetails = () => {
                   />
                 </div>
 
+
+
                 <div className={styles.part2}>
-                  <div>
-                    <div>
-                      {content.media_type === 0 && (
-                        <Slider {...settings}>
-                          {content.media.map((item, i) => (
-                            <img
-                              key={i}
-                              className={styles.sliderImg}
-                              src={item.media_url}
-                              alt=""
-                            />
-                          ))}
-                        </Slider>
-                      )}
+  <div className={styles.part2Content}>
+    <div>
+      <div>
+        {content.media_type === 0 && (
+          <Slider {...settings}>
+            {content.media.map((item, i) => (
+              <img
+                key={i}
+                className={styles.sliderImg}
+                src={item.media_url}
+                alt=""
+              />
+            ))}
+          </Slider>
+        )}
 
-                      {content.media_type === 1 && (
-                        <div className={styles.pdfCon}>
-                          <Document
-                            file={`data:application/pdf;base64,${content.media[0].pdf_url}`}
-                            onLoadSuccess={onDocumentLoadSuccess}
-                            onLoadError={console.error}
-                          >
-                            <Page width="600" pageNumber={pageNumber} />
-                          </Document>
-                        </div>
-                      )}
-                    </div>
-                    {content.media_type === 1 && (
-                      <div className={styles.pdfBtnCon}>
-                        <BsFillArrowLeftCircleFill
-                          className={styles.pdfBtn}
-                          onClick={prevHandler}
-                        />
-                        <BsFillArrowRightCircleFill
-                          className={styles.pdfBtn}
-                          onClick={nextHandler}
-                        />
-                      </div>
-                    )}
+        {content.media_type === 1 && (
+          <div className={styles.pdfCon}>
+            <Document
+              file={`data:application/pdf;base64,${content.media[0].pdf_url}`}
+              onLoadSuccess={onDocumentLoadSuccess}
+              onLoadError={console.error}
+            >
+              <Page width="600" pageNumber={pageNumber} />
+            </Document>
+          </div>
+        )}
+      </div>
+      {content.media_type === 1 && (
+        <div className={styles.pdfBtnCon}>
+          <BsFillArrowLeftCircleFill
+            className={styles.pdfBtn}
+            onClick={prevHandler}
+          />
+          <BsFillArrowRightCircleFill
+            className={styles.pdfBtn}
+            onClick={nextHandler}
+          />
+        </div>
+      )}
 
-                    {content.media_type === 4 && (
-                      <div className={styles.videoPlayerCon}>
-                        <video
-                          src="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
-                          height={500}
-                          controls
-                        />
-                      </div>
-                    )}
-                  </div>
-                </div>
+      {content.media_type === 4 && (
+        <div className={styles.videoPlayerCon}>
+          <video
+            src="http://commondatastorage.googleapis.com/gtv-videos-bucket/sample/BigBuckBunny.mp4"
+            height={500}
+            controls
+          />
+        </div>
+      )}
+    </div>
+
+    {content.download_status === 0 && content.type === 1 ? (
+  <div className={styles.blurOverlay}></div>
+) : null}
+
+{content.download_status === 0 && content.type === 1 ? (
+  <div className={styles.centeredDiv}>
+    <button className={styles.payNowButton} onClick={() => handlePayment(content.id)}>
+      Pay Now
+    </button>
+    <p className={styles.helperText}>Click the button to complete the payment</p>
+  </div>
+) : null}
+
+
+
+  </div>
+</div>
+
+
+
+
               </div>
             </div>
           </div>

@@ -514,7 +514,7 @@ const ProductsPage = () => {
       formData.append("author", author);
       formData.append("type", 0);
       formData.append("content_type", cType);
-      console.log({content});
+
       if (cType == 0) {
         for (let i = 0; i < content.length; i++) {
           formData.append("content[]", content);
@@ -640,10 +640,10 @@ const ProductsPage = () => {
       type === 1
         ? formData.append("price", price)
         : formData.append("price", 0);
-      
-        
 
-        
+
+
+
       try {
         const response = await axios.post(
           `${baseURL}/content-update/${contentID}`,
