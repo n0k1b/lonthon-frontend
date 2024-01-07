@@ -28,6 +28,14 @@ const ProductDetails = () => {
   const [content, setContent] = useState();
   const isLoggedIn = useSelector((state) => state.homepage.isLoggedIn);
   const token = useSelector((state) => state.homepage.token);
+  const headers = {
+    "Content-Type": "application/json",
+  };
+
+  if (isLoggedIn) {
+    headers.Authorization = `Bearer ${token}`;
+  }
+
   const settings = {
     dots: true,
     infinite: false,
@@ -63,13 +71,14 @@ const ProductDetails = () => {
   //Fetch Data
   const dataFetch = async () => {
     setLoading(true);
-    const response = await fetch(`${baseURL}/content/${parseInt(params.id)}`);
-
+    const response = await fetch(`${baseURL}/content/${parseInt(params.id)}`, {
+      method: "GET",
+      headers,
+    });
 
     if (!response.ok) return;
 
     const data = await response.json();
-    console.log(data);
     setContent(data.data);
     setLoading(false);
   };
