@@ -24,7 +24,7 @@ const LongCard = ({ data }) => {
       </div>
       <div className={styles.contentCon}>
         <div className={styles.text_area}>
-          <p className={styles.type}>Novel</p>
+          <p className={styles.type}>{data.sub_category.name}</p>
           <p className={styles.title}>{data.title}</p>
           <p className={styles.author2}>{data.author}</p>
           <p className={styles.des}>{data.summary}</p>
@@ -56,7 +56,9 @@ const LongCard = ({ data }) => {
         </div> */}
       </div>
 
-      <div className={styles.price}>Free</div>
+      <div className={styles.price}>
+        {data.type == 0 ? "Free" : `${data.price} Tk`}
+      </div>
     </div>
   );
 };

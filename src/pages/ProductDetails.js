@@ -240,11 +240,11 @@ const ProductDetails = () => {
       )}
     </div>
 
-    {content.download_status === 0 && content.type === 1 ? (
+    {content.download_status == 0 && content.type == 1 ? (
   <div className={styles.blurOverlay}></div>
 ) : null}
 
-{content.download_status === 0 && content.type === 1 ? (
+{content.download_status == 0 && content.type == 1 ? (
   <div className={styles.centeredDiv}>
     <button className={styles.payNowButton} onClick={() => handlePayment(content.id)}>
       Pay Now
