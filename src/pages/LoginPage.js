@@ -46,7 +46,7 @@ const LoginPage = () => {
         password: password,
       };
 
-      console.log(payload);
+
 
       const response = await fetch(`${baseURL}/login`, {
         method: "POST",
@@ -56,7 +56,7 @@ const LoginPage = () => {
         body: JSON.stringify(payload),
       });
 
-      console.log(response);
+
 
       if (!response.ok) {
         setIsLoading(false);
@@ -65,7 +65,7 @@ const LoginPage = () => {
 
       const data = await response.json();
 
-      console.log(data);
+
       if (!data.status) {
         setError(true);
         setErrorMsg(data.message);

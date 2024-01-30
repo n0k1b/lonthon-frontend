@@ -7,7 +7,7 @@ import { baseURL } from "../api";
 import GreyBtn from "../components/UI/GreyBtn";
 import addBtn from "../image/addBtn.png";
 import addBtn2 from "../image/addBtn2.png";
-import dp from "../image/dp.jpg";
+import dp from "../image/dp.png";
 import styles from "./DashboardPage.module.css";
 import classes from "./ProductsPage.module.css";
 
@@ -134,7 +134,7 @@ const ProductsPage = () => {
         setImage([...image, file]);
       }
     } else {
-      console.log("No file selected");
+
     }
   };
 
@@ -143,7 +143,7 @@ const ProductsPage = () => {
       setThumbImg(event.target.files[0]);
       setThumbImgDisplay(URL.createObjectURL(event.target.files[0]));
     } else {
-      console.log("No file selected");
+
     }
   };
 
@@ -152,7 +152,7 @@ const ProductsPage = () => {
       setBanImg(event.target.files[0]);
       setBanImgDisplay(URL.createObjectURL(event.target.files[0]));
     } else {
-      console.log("No file selected");
+
     }
   };
 
@@ -249,7 +249,7 @@ const ProductsPage = () => {
   const handlePDFInputChange = (event) => {
     const file = event.target.files[0];
     setSelectedPdfName(file.name);
-    console.log(file);
+
     const reader = new FileReader();
     reader.onload = () => {
       // Use the raw file (not base64 encoded)
@@ -308,7 +308,7 @@ const ProductsPage = () => {
     if (!response.ok) return;
 
     const data = await response.json();
-    console.log(data);
+
     setCategoryData(data.data);
   };
   //Data Fetch
@@ -319,7 +319,7 @@ const ProductsPage = () => {
     if (!response.ok) return;
 
     const data = await response.json();
-    console.log(data);
+
     setContentSingleData(data.data);
     const {
       title,
@@ -335,7 +335,7 @@ const ProductsPage = () => {
       price
     } = data.data;
 
-    console.log(data.data);
+
     if (media_type == 1) {
       clearContentHandler();
       setSelectedPdfName('file.pdf')
@@ -389,7 +389,7 @@ const ProductsPage = () => {
     if (!response.ok) return;
 
     const data = await response.json();
-    console.log(data);
+
     setSubCategoryData(data.data);
   };
 
@@ -405,7 +405,7 @@ const ProductsPage = () => {
     if (!response.ok) return;
 
     const data = await response.json();
-    console.log(data);
+
     setGenreData(data.data);
   };
 
@@ -422,7 +422,7 @@ const ProductsPage = () => {
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log(response);
+
 
     if (!response.ok) {
       setLoading(false);
@@ -430,7 +430,7 @@ const ProductsPage = () => {
     }
 
     const data = await response.json();
-    console.log(data.data);
+
     setDashboardData(data.data);
     setData(data.data.contents);
     setLoading(false);
@@ -539,7 +539,7 @@ const ProductsPage = () => {
           }
         );
 
-        console.log("Response Data:", response.data);
+
 
         if (!response.data.success) {
           throw new Error(response.data.message);
@@ -558,20 +558,7 @@ const ProductsPage = () => {
       }
     } else {
       setFormFillUpError(true);
-      console.log(
-        {title,
-        thumbImg,
-        banImg,
-        description,
-        author,
-        selectedCategory,
-        selectedSubCategory,
-        selectedGenre,
-        type,
-        price,
-        cType,
-        content
-      });
+
 
       if (!title) setTitleError(true);
       if (!description) setDesError(true);
@@ -628,7 +615,7 @@ const ProductsPage = () => {
       formData.append("author", author);
       formData.append("type", 0);
       formData.append("content_type", cType);
-      console.log({content});
+
       if (cType == 0) {
         for (let i = 0; i < content.length; i++) {
           formData.append("content[]", content);
@@ -656,7 +643,7 @@ const ProductsPage = () => {
           }
         );
 
-        console.log("Response Data:", response.data);
+
 
         if (!response.data.success) {
           throw new Error(response.data.message);
@@ -675,20 +662,7 @@ const ProductsPage = () => {
       }
     } else {
       setFormFillUpError(true);
-      console.log(
-        {title,
-        thumbImg,
-        banImg,
-        description,
-        author,
-        selectedCategory,
-        selectedSubCategory,
-        selectedGenre,
-        type,
-        price,
-        cType,
-        content
-      });
+
 
       if (!title) setTitleError(true);
       if (!description) setDesError(true);
@@ -737,10 +711,10 @@ const ProductsPage = () => {
   const handleVideoChange = (event) => {
     if (event.target.files[0]) {
       const file = event.target.files[0];
-      console.log(file);
+
       setSelectedVideo(URL.createObjectURL(file));
       setVideoFile(file);
-      console.log(URL.createObjectURL(file), "URL");
+
     }
   };
 

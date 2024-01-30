@@ -103,7 +103,7 @@ const ProductDetails = () => {
       );
 
       const data = response.data;
-      console.log(data);
+
 
 
       if (data.status) {
@@ -114,7 +114,7 @@ const ProductDetails = () => {
         console.error('Failed to initiate payment');
       }
     } catch (error) {
-      console.log('test');
+
       console.error('Error:', error);
     }
   };
@@ -126,7 +126,7 @@ const ProductDetails = () => {
       dataFetch();
     } catch (error) {
       console.error(error);
-      console.log(error);
+
     }
   }, []);
 

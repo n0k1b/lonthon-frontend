@@ -130,7 +130,7 @@ const LiteraturePage = () => {
 
     const data = await response.json();
 
-    console.log(data.data.content_data);
+
     setContentData(data.data.content_data);
     setDisplayedContent(data.data.content_data);
     setGenreData(data.data.genre);

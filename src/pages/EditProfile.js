@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import styles from "./DashboardPage.module.css";
 import classes from "./EditProfile.module.css";
-import dp from "../image/dp.jpg";
+import dp from "../image/dp.png";
 import { Link } from "react-router-dom";
 import { FaUserCircle, FaPencilAlt } from "react-icons/fa";
 import GreyBtn from "../components/UI/GreyBtn";

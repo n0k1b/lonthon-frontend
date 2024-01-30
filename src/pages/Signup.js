@@ -73,7 +73,6 @@ const Signup = () => {
           password: password,
           password_confirmation: cPass,
         };
-        console.log(data);
 
         const response = await fetch(`${baseURL}/signup`, {
           method: "POST",
@@ -83,7 +82,7 @@ const Signup = () => {
           body: JSON.stringify(data),
         });
 
-        console.log(response);
+
 
         if (!response.ok) {
           setIsLoading(false);
@@ -91,7 +90,7 @@ const Signup = () => {
         }
 
         const fData = await response.json();
-        console.log(fData);
+
 
         setSignupSection(false);
         setOtpSection(true);
@@ -123,7 +122,7 @@ const Signup = () => {
         body: JSON.stringify(payload),
       });
 
-      console.log(response);
+
 
       if (!response.ok) {
         setIsLoading(false);
@@ -131,7 +130,7 @@ const Signup = () => {
       }
 
       const data = await response.json();
-      console.log(data);
+
 
       setOtpSuccMsg(data.message);
       setOtpSucc(true);

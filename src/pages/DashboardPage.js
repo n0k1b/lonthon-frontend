@@ -1,6 +1,6 @@
 import React from "react";
 import styles from "./DashboardPage.module.css";
-import dp from "../image/dp.jpg";
+import dp from "../image/dp.png";
 import InfoCard from "../components/UI/InfoCard";
 import {
   BarChart,
@@ -60,7 +60,7 @@ const DashboardPage = () => {
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log(response);
+
 
     if (!response.ok) {
       setLoading(false);
@@ -68,7 +68,7 @@ const DashboardPage = () => {
     }
 
     const data = await response.json();
-    console.log(data.data);
+
     setDashboardData(data.data);
     dispatch(homepageActions.setDashboardData(data.data));
     setLoading(false);

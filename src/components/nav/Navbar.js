@@ -11,6 +11,7 @@ import { useDispatch, useSelector } from "react-redux";
 import { homepageActions } from "../../redux/homepage-slice";
 
 const Navbar = ({ menuItems }) => {
+
   const dispatch = useDispatch();
   const isLoggedIn = useSelector((state) => state.homepage.isLoggedIn);
 
@@ -133,77 +134,7 @@ const Navbar = ({ menuItems }) => {
             )}
           </div>
 
-          {/* Add expanded class to toggle menu mobile view */}
-          {/* <div className={`${styles.links} mobile-links`} ref={toggleMenu}>
-            <Link to="/" className={styles.link}>
-              <p className={styles.nav_link}>HOME</p>
-            </Link>
 
-            <div
-              onMouseEnter={() => litDDHandler("Open")}
-              onMouseLeave={() => litDDHandler("Close")}
-              className={styles.lit}
-            >
-              <Link className={styles.link} to="/literature">
-                <p className={styles.nav_link}>LITERATURE</p>
-              </Link>
-              {litDDOpen && (
-                <div className={styles.dropDown}>
-                  <DropDown links={["Novel", "Poems", "Others"]} />
-                </div>
-              )}
-            </div>
-
-            <div
-              onMouseEnter={() => McDDHandler("Open")}
-              onMouseLeave={() => McDDHandler("Close")}
-              className={styles.lit}
-            >
-              <p className={styles.nav_link}>MEDIA CONTENT</p>
-              {mcDDOpen && (
-                <div className={styles.dropDown}>
-                  <DropDown
-                    links={[
-                      "Script",
-                      "Lyrics",
-                      "Documentary",
-                      "Short Flims",
-                      "TVC",
-                      "Web Series",
-                      "Others",
-                    ]}
-                  />
-                </div>
-              )}
-            </div>
-
-            <div
-              onMouseEnter={() => AeDDHandler("Open")}
-              onMouseLeave={() => AeDDHandler("Close")}
-              className={styles.lit}
-            >
-              <p className={styles.nav_link}>AUDIO E-BOOK</p>
-              {aeDDOpen && (
-                <div className={styles.dropDown}>
-                  <DropDown
-                    links={[
-                      "Novel",
-                      "Script",
-                      "Music",
-                      "Conversation",
-                      "Others",
-                    ]}
-                  />
-                </div>
-              )}
-            </div>
-
-            <p className={styles.nav_link}>OTHERS</p>
-            <p className={styles.nav_link}>PROMOTION</p>
-            <p className={styles.nav_link}>DASHBOARD</p>
-            <p className={styles.nav_link}>LOGIN</p>
-            <GreyBtn>SIGNUP</GreyBtn>
-          </div> */}
           <div className={styles.toggleMenu}>
             <button className="primary-icon-button" onClick={handleToggleMenu}>
               <FiMenu />

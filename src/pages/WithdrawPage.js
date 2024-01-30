@@ -2,7 +2,7 @@ import React, { useState, useEffect } from "react";
 import styles from "./DashboardPage.module.css";
 import { Link, Navigate } from "react-router-dom";
 
-import dp from "../image/dp.jpg";
+import dp from "../image/dp.png";
 
 import classes from "./WithdrawPage.module.css";
 import { useDispatch, useSelector } from "react-redux";
@@ -105,7 +105,7 @@ const WithdrawPage = () => {
         Authorization: `Bearer ${token}`,
       },
     });
-    console.log(response);
+
 
     if (!response.ok) {
       setLoading(false);
@@ -113,7 +113,7 @@ const WithdrawPage = () => {
     }
 
     const data = await response.json();
-    console.log(data.data);
+
     setDashboardData(data.data);
     dispatch(homepageActions.setDashboardData(data.data));
     setLoading(false);

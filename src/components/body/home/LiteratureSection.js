@@ -9,7 +9,7 @@ const LiteratureSection = ({ data }) => {
       <div className={styles.titleCon}>
         <p className={styles.title}>{data.category_name}</p>
         <Link className={styles.link} to={`/${data.category_name}`}>
-          <p className={styles.view_all}>View All</p>
+          <p className={styles.view_all}></p>
         </Link>
       </div>
       <div className={styles.carausel_section}>
