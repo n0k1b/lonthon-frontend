@@ -2,7 +2,7 @@ import React, { useEffect, useState } from "react";
 import styles from "./App.module.css";
 import Navbar from "./components/nav/Navbar";
 import HomePage from "./pages/HomePage";
-import { HashRouter  as Router, Routes, Route } from "react-router-dom";
+import { HashRouter as Router, Routes, Route } from "react-router-dom";
 import Footer from "./components/nav/Footer";
 import LiteraturePage from "./pages/LiteraturePage";
 import { baseURL } from "./api";
@@ -27,8 +27,6 @@ function App() {
   const isLoading = useSelector((state) => state.homepage.isLoading);
   const [favIcon, setFavIcon] = useState("");
   const [navbarMenu, setNavbarMenu] = useState();
-  const [conByCat, setConByCat] = useState();
-  const [busSettings, setBusSettings] = useState();
 
   const getBusinessSettingsData = async () => {
     dispatch(homepageActions.setIsLoading(true));
@@ -40,11 +38,8 @@ function App() {
 
     console.log(data.data[0]);
     dispatch(homepageActions.setHomepageData(data.data[0]));
-    // dispatch(homepageActions.setIsLoading(false));
     setFavIcon(data.data[0].favicon);
-    setBusSettings(true);
     getContentByCategory();
-    // getNavbarMenu();
 
     const token = localStorage.getItem("tokenLonthon");
     const userData = localStorage.getItem("userDataLonthon");
@@ -69,7 +64,6 @@ function App() {
     console.log(data.data);
     dispatch(homepageActions.setContentByCat(data.data));
     dispatch(homepageActions.setIsLoading(false));
-    setConByCat(true);
   };
 
   const getNavbarMenu = async () => {
@@ -79,22 +73,26 @@ function App() {
 
     const data = await response.json();
 
-    console.log(data.data);
-    setNavbarMenu(data.data);
+    console.log(data.data, "NAV BAR DATA");
+
+    const NavbarMenuItems = [
+      { label: "HOME", url: "/" },
+      ...data.data,
+      { label: "OTHERS", id: null, url: "others" },
+      { label: "PROMOTIONS", id: null, url: "promotions" },
+      { label: "DASHBOARD", id: null, url: "dashboard" },
+    ];
+
+    console.log(NavbarMenuItems);
+
+    setNavbarMenu(NavbarMenuItems);
     dispatch(homepageActions.setIsLoading(false));
   };
 
   useEffect(() => {
-    // dispatch(homepageActions.setIsLoading(true));
     getBusinessSettingsData();
+    getNavbarMenu();
   }, []);
-
-  // useEffect(() => {
-  //   if (navbarMenu && conByCat && busSettings)
-  //     dispatch(homepageActions.setIsLoading(false));
-  // }, [navbarMenu, conByCat, busSettings]);
-
-  // console.log([navbarMenu, NavbarMenuItems], "HHHHH");
 
   return (
     <Router>
@@ -113,7 +111,7 @@ function App() {
 
         {!isLoading && (
           <>
-            <Navbar menuItems={NavbarMenuItems} />
+            <Navbar menuItems={navbarMenu} />
             <Helmet>
               <link rel="icon" href={favIcon} />
             </Helmet>
@@ -156,41 +154,5 @@ function App() {
     </Router>
   );
 }
-
-const NavbarMenuItems = [
-  { label: "HOME", url: "/" },
-  {
-    label: "LITERATUE",
-    id: 1,
-    submenu: [
-      { name: "Novel", id: 1 },
-      { name: "Novel", id: 2 },
-      { name: "Others", id: 3 },
-    ],
-  },
-  {
-    label: "MEDIA CONTENT",
-    id: 2,
-    submenu: [
-      { name: "Script", id: 1 },
-      { name: "Lyrics", id: 1 },
-      { name: "Documentary", id: 1 },
-      { name: "Short Films", id: 1 },
-      { name: "TVC", id: 1 },
-    ],
-  },
-  {
-    label: "AUDIO E-BOOK",
-    id: 3,
-    submenu: [
-      { name: "Novel", id: 1 },
-      { name: "Novel", id: 2 },
-      { name: "Others", id: 3 },
-    ],
-  },
-  { label: "OTHERS", id: null, url: "others" },
-  { label: "PROMOTIONS", id: null, url: "promotions" },
-  { label: "DASHBOARD", id: null, url: "dashboard" },
-];
 
 export default App;

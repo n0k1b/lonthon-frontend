@@ -11,42 +11,11 @@ import { useDispatch, useSelector } from "react-redux";
 import { homepageActions } from "../../redux/homepage-slice";
 
 const Navbar = ({ menuItems }) => {
-
   const dispatch = useDispatch();
   const isLoggedIn = useSelector((state) => state.homepage.isLoggedIn);
-
-  // const [litDDOpen, setLitDDOpen] = useState(false);
-  // const [mcDDOpen, setMcDDOpen] = useState(false);
-  // const [aeDDOpen, setAeDDOpen] = useState(false);
   const [dropdownStates, setDropdownStates] = useState();
   const toggleMenu = useRef();
 
-  // const litDDHandler = (sw) => {
-  //   if (sw === "Open") {
-  //     setLitDDOpen(true);
-  //   }
-  //   if (sw === "Close") {
-  //     setLitDDOpen(false);
-  //   }
-  // };
-
-  // const McDDHandler = (sw) => {
-  //   if (sw === "Open") {
-  //     setMcDDOpen(true);
-  //   }
-  //   if (sw === "Close") {
-  //     setMcDDOpen(false);
-  //   }
-  // };
-
-  // const AeDDHandler = (sw) => {
-  //   if (sw === "Open") {
-  //     setAeDDOpen(true);
-  //   }
-  //   if (sw === "Close") {
-  //     setAeDDOpen(false);
-  //   }
-  // };
   const handleToggleMenu = () => {
     toggleMenu.current.classList.toggle("expanded");
   };
@@ -73,76 +42,91 @@ const Navbar = ({ menuItems }) => {
   };
 
   return (
-    <Wrapper menuSize={menuItems.length}>
-      <div>
-        <div className={styles.content_world}>
-          <p className={styles.cw_text}>CONTENT WORLD</p>
-          <img className={styles.logo} alt="logo" src={logo} />
-        </div>
-
-        <div className={styles.nav_container}>
-          <Link className={styles.link} to="/">
-            <div className={styles.logo_container}>
-              <img className={styles.logo} alt="logo" src={logo} />
-              <p>Lonthon</p>
-            </div>
-          </Link>
-          <div className={`${styles.links} mobile-links`} ref={toggleMenu}>
-            {menuItems.map((menu, index) => (
-              <>
-                {!menu.submenu ? (
-                  <>
-                    {!menu.id && (
-                      <Link to={menu.url} className={styles.link} key={index}>
-                        <p className={styles.nav_link}>{menu.label}</p>
-                      </Link>
-                    )}
-                  </>
-                ) : (
-                  <div
-                    key={index}
-                    className={styles.lit}
-                    onMouseEnter={() => toggleDropdown(index, true)}
-                    onMouseLeave={() => toggleDropdown(index, false)}
-                  >
-                    <p className={styles.nav_link}>{menu.label}</p>
-                    {dropdownStates && dropdownStates[index] && (
-                      <div className={styles.dropDown}>
-                        <DropDown links={menu.submenu} catg={menu.id} />
-                      </div>
-                    )}
-                  </div>
-                )}
-              </>
-            ))}
-
-            {!isLoggedIn && (
-              <>
-                <Link className={styles.link} to="/login">
-                  <p className={styles.nav_link}>LOGIN</p>
-                </Link>
-                <Link className={styles.link} to="/signup">
-                  <GreyBtn>SIGNUP</GreyBtn>
-                </Link>
-              </>
-            )}
-
-            {isLoggedIn && (
-              <div onClick={logoutHandler}>
-                <GreyBtn>LOGOUT</GreyBtn>
+    <>
+      {menuItems && (
+        <>
+          <Wrapper menuSize={menuItems.length}>
+            <div>
+              <div className={styles.content_world}>
+                <p className={styles.cw_text}>CONTENT WORLD</p>
+                <img className={styles.logo} alt="logo" src={logo} />
               </div>
-            )}
-          </div>
 
+              <div className={styles.nav_container}>
+                <Link className={styles.link} to="/">
+                  <div className={styles.logo_container}>
+                    <img className={styles.logo} alt="logo" src={logo} />
+                    <p>Lonthon</p>
+                  </div>
+                </Link>
+                <div
+                  className={`${styles.links} mobile-links`}
+                  ref={toggleMenu}
+                >
+                  {menuItems.map((menu, index) => (
+                    <>
+                      {!menu.submenu ? (
+                        <>
+                          {!menu.id && (
+                            <Link
+                              to={menu.url}
+                              className={styles.link}
+                              key={index}
+                            >
+                              <p className={styles.nav_link}>{menu.label}</p>
+                            </Link>
+                          )}
+                        </>
+                      ) : (
+                        <div
+                          key={index}
+                          className={styles.lit}
+                          onMouseEnter={() => toggleDropdown(index, true)}
+                          onMouseLeave={() => toggleDropdown(index, false)}
+                        >
+                          <p className={styles.nav_link}>{menu.label}</p>
+                          {dropdownStates && dropdownStates[index] && (
+                            <div className={styles.dropDown}>
+                              <DropDown links={menu.submenu} catg={menu.id} />
+                            </div>
+                          )}
+                        </div>
+                      )}
+                    </>
+                  ))}
 
-          <div className={styles.toggleMenu}>
-            <button className="primary-icon-button" onClick={handleToggleMenu}>
-              <FiMenu />
-            </button>
-          </div>
-        </div>
-      </div>
-    </Wrapper>
+                  {!isLoggedIn && (
+                    <>
+                      <Link className={styles.link} to="/login">
+                        <p className={styles.nav_link}>LOGIN</p>
+                      </Link>
+                      <Link className={styles.link} to="/signup">
+                        <GreyBtn>SIGNUP</GreyBtn>
+                      </Link>
+                    </>
+                  )}
+
+                  {isLoggedIn && (
+                    <div onClick={logoutHandler}>
+                      <GreyBtn>LOGOUT</GreyBtn>
+                    </div>
+                  )}
+                </div>
+
+                <div className={styles.toggleMenu}>
+                  <button
+                    className="primary-icon-button"
+                    onClick={handleToggleMenu}
+                  >
+                    <FiMenu />
+                  </button>
+                </div>
+              </div>
+            </div>
+          </Wrapper>
+        </>
+      )}
+    </>
   );
 };
 const Wrapper = styled.div`
