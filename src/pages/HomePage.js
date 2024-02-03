@@ -2,8 +2,6 @@ import React from "react";
 import styles from "./HomePage.module.css";
 import TransBgBtn from "../components/UI/TransBgBtn";
 import LiteratureSection from "../components/body/home/LiteratureSection";
-import MediaSection from "../components/body/home/MediaSection";
-import AudioSection from "../components/body/home/AudioSection";
 import { useSelector } from "react-redux";
 import background from "../image/background_home.png";
 
