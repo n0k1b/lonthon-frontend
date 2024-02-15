@@ -142,7 +142,7 @@ const LiteraturePage = () => {
   useEffect(() => {
     if (genreData.length !== 0) {
       let temp = [];
-      genreData.map((item) => temp.push(item.genre));
+      genreData.map((item) => temp.push(item.name));
       setGenreDisplay(temp);
     }
   }, [, genreData]);
