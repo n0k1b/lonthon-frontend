@@ -16,6 +16,7 @@ import card3 from "../image/card3.png";
 import LongCard from "../components/UI/LongCard";
 import { baseURL } from "../api";
 import { useParams } from "react-router-dom";
+import { CircularProgress } from "@mui/material";
 
 const CONTENT = [
   {
@@ -130,12 +131,11 @@ const LiteraturePage = () => {
 
     const data = await response.json();
 
-
     setContentData(data.data.content_data);
     setDisplayedContent(data.data.content_data);
     setGenreData(data.data.genre);
-    setCategoryName(data.data.content_data[0].category_name);
-    setCategoryName(data.data.content_data[0].category_name);
+    setCategoryName(data.data.content_data[0].category.name);
+    setSubCategoryName(data.data.content_data[0].sub_category.name);
     setIsLoading(false);
   };
 
@@ -164,6 +164,21 @@ const LiteraturePage = () => {
 
   return (
     <>
+      {isLoading && (
+        <div>
+          <Box
+            sx={{
+              display: "flex",
+              justifyContent: "center",
+              marginTop: "50px",
+              marginBottom: "500px",
+            }}
+          >
+            <CircularProgress color="inherit" />
+          </Box>
+        </div>
+      )}
+
       {!isLoading && (
         <div>
           <div className={styles.cover}>
@@ -253,11 +268,10 @@ const LiteraturePage = () => {
 
               <Page>
                 <ContentArea>
-                  {displayedContent.map((data) =>
-                    data.content.map((item, i) => (
+                  {displayedContent &&
+                    displayedContent.map((item, i) => (
                       <LongCard key={i} data={item} />
-                    ))
-                  )}
+                    ))}
                 </ContentArea>
 
                 <div className={styles.paginationContainer}>

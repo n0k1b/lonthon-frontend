@@ -134,7 +134,6 @@ const ProductsPage = () => {
         setImage([...image, file]);
       }
     } else {
-
     }
   };
 
@@ -143,7 +142,6 @@ const ProductsPage = () => {
       setThumbImg(event.target.files[0]);
       setThumbImgDisplay(URL.createObjectURL(event.target.files[0]));
     } else {
-
     }
   };
 
@@ -152,7 +150,6 @@ const ProductsPage = () => {
       setBanImg(event.target.files[0]);
       setBanImgDisplay(URL.createObjectURL(event.target.files[0]));
     } else {
-
     }
   };
 
@@ -252,10 +249,9 @@ const ProductsPage = () => {
 
     const reader = new FileReader();
     reader.onload = () => {
-      // Use the raw file (not base64 encoded)
       setPdfFile(file);
     };
-    reader.readAsArrayBuffer(file); // or reader.readAsBinaryString(file) depending on your needs
+    reader.readAsArrayBuffer(file);
   };
 
   const handleEdit = async (id) => {
@@ -332,14 +328,13 @@ const ProductsPage = () => {
       genre_id,
       type,
       media_type,
-      price
+      price,
     } = data.data;
-
 
     if (media_type == 1) {
       clearContentHandler();
-      setSelectedPdfName('file.pdf')
-      setPdfFile(data.data.media[0].pdf_url)
+      setSelectedPdfName("file.pdf");
+      setPdfFile(data.data.media[0].pdf_url);
       setAddPdf(true);
       setAddImage(false);
       setAddText(false);
@@ -368,7 +363,7 @@ const ProductsPage = () => {
     }
 
     setTitle(title);
-    setPrice(type == 1 ? price : 0)
+    setPrice(type == 1 ? price : 0);
     setThumbImg(thumbnail_image);
     setBanImg(feature_image);
     setDescription(summary);
@@ -422,7 +417,6 @@ const ProductsPage = () => {
         Authorization: `Bearer ${token}`,
       },
     });
-
 
     if (!response.ok) {
       setLoading(false);
@@ -539,8 +533,6 @@ const ProductsPage = () => {
           }
         );
 
-
-
         if (!response.data.success) {
           throw new Error(response.data.message);
         }
@@ -558,7 +550,6 @@ const ProductsPage = () => {
       }
     } else {
       setFormFillUpError(true);
-
 
       if (!title) setTitleError(true);
       if (!description) setDesError(true);
@@ -628,9 +619,6 @@ const ProductsPage = () => {
         ? formData.append("price", price)
         : formData.append("price", 0);
 
-
-
-
       try {
         const response = await axios.post(
           `${baseURL}/content-update/${contentID}`,
@@ -638,12 +626,10 @@ const ProductsPage = () => {
           {
             headers: {
               // Authorization: `Bearer ${token}`,
-              'Content-Type': 'application/json'
+              "Content-Type": "application/json",
             },
           }
         );
-
-
 
         if (!response.data.success) {
           throw new Error(response.data.message);
@@ -662,7 +648,6 @@ const ProductsPage = () => {
       }
     } else {
       setFormFillUpError(true);
-
 
       if (!title) setTitleError(true);
       if (!description) setDesError(true);
@@ -714,7 +699,6 @@ const ProductsPage = () => {
 
       setSelectedVideo(URL.createObjectURL(file));
       setVideoFile(file);
-
     }
   };
 
@@ -848,7 +832,7 @@ const ProductsPage = () => {
                 <p className={classes.back} onClick={goBackHandler}>
                   Go back
                 </p>
-                <p className={classes.pTitle}>Producte Upload</p>
+                <p className={classes.pTitle}>Content Upload</p>
 
                 <div className={classes.filterContainer}>
                   <select
@@ -861,7 +845,7 @@ const ProductsPage = () => {
                     </option>
                     {categoryData.map((op, i) => (
                       <option key={i} value={op.id}>
-                        {op.name}
+                        {op.label}
                       </option>
                     ))}
                   </select>
@@ -1697,7 +1681,7 @@ const ProductsPage = () => {
                           className={classes.previewImg}
                           src={banImgDisplay}
                           onClick={() => {
-                            setBanImg(null)
+                            setBanImg(null);
                           }}
                           id="banImgRem"
                         />

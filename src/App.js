@@ -2,7 +2,8 @@ import React, { useEffect, useState } from "react";
 import styles from "./App.module.css";
 import Navbar from "./components/nav/Navbar";
 import HomePage from "./pages/HomePage";
-import { HashRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+// import { HashRouter as Router, Routes, Route } from "react-router-dom";
 import Footer from "./components/nav/Footer";
 import LiteraturePage from "./pages/LiteraturePage";
 import { baseURL } from "./api";
@@ -36,7 +37,6 @@ function App() {
 
     const data = await response.json();
 
-    console.log(data.data[0]);
     dispatch(homepageActions.setHomepageData(data.data[0]));
     setFavIcon(data.data[0].favicon);
     getContentByCategory();
@@ -48,20 +48,17 @@ function App() {
       dispatch(homepageActions.setIsLoggedIn(true));
       dispatch(homepageActions.setToken(token));
       dispatch(homepageActions.setUserData(userData));
-      console.log("logged in");
     }
   };
 
   const getContentByCategory = async () => {
     dispatch(homepageActions.setIsLoading(true));
     const response = await fetch(`${baseURL}/content-by-category`);
-    console.log("res => ", response);
 
     if (!response.ok) return;
 
     const data = await response.json();
 
-    console.log(data.data);
     dispatch(homepageActions.setContentByCat(data.data));
     dispatch(homepageActions.setIsLoading(false));
   };
@@ -73,8 +70,6 @@ function App() {
 
     const data = await response.json();
 
-    console.log(data.data, "NAV BAR DATA");
-
     const NavbarMenuItems = [
       { label: "HOME", url: "/" },
       ...data.data,
@@ -82,8 +77,6 @@ function App() {
       { label: "PROMOTIONS", id: null, url: "promotions" },
       { label: "DASHBOARD", id: null, url: "dashboard" },
     ];
-
-    console.log(NavbarMenuItems);
 
     setNavbarMenu(NavbarMenuItems);
     dispatch(homepageActions.setIsLoading(false));
