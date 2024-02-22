@@ -18,6 +18,7 @@
 .rightCon {
   background-color: #eae9e9;
   height: fit-content;
+  min-height: 500px;
   width: 78%;
   display: flex;
   justify-content: space-between;
@@ -175,8 +176,8 @@
 .link {
   text-decoration: none;
 }
-.p10{
-  padding: 10px
+.p10 {
+  padding: 10px;
 }
 
 @media screen and (max-width: 730px) {

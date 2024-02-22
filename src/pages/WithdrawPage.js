@@ -8,7 +8,7 @@ import classes from "./WithdrawPage.module.css";
 import { useDispatch, useSelector } from "react-redux";
 import { homepageActions } from "../redux/homepage-slice";
 import { baseURL } from "../api";
-import { Box, CircularProgress } from "@mui/material";
+import { Alert, Box, CircularProgress, Snackbar } from "@mui/material";
 import InfoCard from "../components/UI/InfoCard";
 import GreyBtn from "../components/UI/GreyBtn";
 import Modal from "@mui/material/Modal";
@@ -80,21 +80,45 @@ const WithdrawPage = () => {
   const [loading, setLoading] = useState(false);
   const [dashboardData, setDashboardData] = useState();
   const [openModal, setOpenModal] = React.useState(false);
-  const [balance, setBalance] = useState(5000);
+  const [balance, setBalance] = useState(0);
   const [amount, setAmount] = useState();
+  const [transactions, setTransactions] = useState([]);
 
   const [insuffErr, setInsuffErr] = useState(false);
   const [inputErr, setInputErr] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [successMsg, setSuccessMsg] = useState("");
 
   const [bkashSel, setBkashSel] = useState();
   const [nagadSel, setNagadSel] = useState();
-  const [paypalSel, setPaypalSel] = useState();
+  const [bankSel, setBankSel] = useState();
 
   const [bnAccNum, setBnAccNum] = useState();
-  const [paypalAccNum, setPaypalAccNum] = useState();
+  const [bankAccNum, setBankAccNum] = useState();
+  const [bankBranchName, setBankBranchName] = useState("");
+  const [bankAccDistrict, setBankAccDistrict] = useState("");
 
   const handleOpen = () => setOpenModal(true);
-  const handleClose = () => setOpenModal(false);
+  const handleClose = () => {
+    setInsuffErr(false);
+    setInputErr(false);
+    setOpenModal(false);
+  };
+
+  const clearHandler = () => {
+    setBkashSel(false);
+    setNagadSel(false);
+    setBankSel(false);
+    setBnAccNum();
+    setBankAccNum();
+    setBankBranchName("");
+    setBankAccDistrict("");
+  };
+
+  const handleCloseSuccess = () => {
+    setSuccess(false);
+    setSuccessMsg("");
+  };
 
   const dashboardDataFetch = async () => {
     setLoading(true);
@@ -106,7 +130,6 @@ const WithdrawPage = () => {
       },
     });
 
-
     if (!response.ok) {
       setLoading(false);
       return;
@@ -114,14 +137,70 @@ const WithdrawPage = () => {
 
     const data = await response.json();
 
+    //withdraw-dashboard
+    const res = await fetch(`${baseURL}/withdraw-dashboard`, {
+      method: "GET",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`,
+      },
+    });
+
+    if (!res.ok) {
+      setLoading(false);
+      return;
+    }
+
+    const data2 = await res.json();
+    setBalance(data2.data.balance);
+    setTransactions(data2.data.last_transactions);
+
     setDashboardData(data.data);
     dispatch(homepageActions.setDashboardData(data.data));
     setLoading(false);
   };
 
-  const withdrawHandler = () => {
-    if (amount > balance) setInsuffErr(true);
-    if (!amount || typeof amount !== "number") setInputErr(true);
+  const withdrawHandler = async () => {
+    if ((amount) => balance) setInsuffErr(true);
+    if (typeof amount !== "number") setInputErr(true);
+    if (amount < balance && typeof amount === "number") {
+      setInsuffErr(false);
+      setInputErr(false);
+
+      let payload;
+      if (bkashSel || nagadSel) {
+        payload = {
+          account_number: bnAccNum,
+          account_type: bkashSel ? "Bkash" : "Nagad",
+          amount: amount,
+        };
+      }
+      if (bankSel) {
+        payload = {
+          account_number: bankAccNum,
+          account_type: "Bank",
+          amount: amount,
+          branch_name: bankBranchName,
+          district: bankAccDistrict,
+        };
+      }
+
+      const response = await fetch(`${baseURL}/withdraw-request`, {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${token}`,
+        },
+        body: JSON.stringify(payload),
+      });
+
+      const data = await response.json();
+      clearHandler();
+
+      setOpenModal(false);
+      setSuccess(true);
+      setSuccessMsg(data.message);
+    }
   };
 
   useEffect(() => {
@@ -133,18 +212,18 @@ const WithdrawPage = () => {
   const bkashSelectHandler = () => {
     setBkashSel(true);
     setNagadSel(false);
-    setPaypalSel(false);
+    setBankSel(false);
   };
 
   const nagadSelectHandler = () => {
     setBkashSel(false);
     setNagadSel(true);
-    setPaypalSel(false);
+    setBankSel(false);
   };
-  const paypalSelectHandler = () => {
+  const bankSelectHandler = () => {
     setBkashSel(false);
     setNagadSel(false);
-    setPaypalSel(true);
+    setBankSel(true);
   };
 
   return (
@@ -219,11 +298,8 @@ const WithdrawPage = () => {
                     >
                       <GreyBtn>Nagad</GreyBtn>
                     </div>
-                    <div
-                      className={classes.btnCon}
-                      onClick={paypalSelectHandler}
-                    >
-                      <GreyBtn>Paypal</GreyBtn>
+                    <div className={classes.btnCon} onClick={bankSelectHandler}>
+                      <GreyBtn>Bank</GreyBtn>
                     </div>
                   </div>
 
@@ -239,13 +315,25 @@ const WithdrawPage = () => {
                       />
                     </div>
                   )}
-                  {paypalSel && (
+                  {bankSel && (
                     <div>
-                      <p className={classes.bnTitle}>Enter Paypal ID:</p>
+                      <p className={classes.bnTitle}>Enter Account Number:</p>
                       <input
                         className={classes.inputText}
                         type="number"
-                        onChange={(e) => setPaypalAccNum(e.target.value)}
+                        onChange={(e) => setBankAccNum(e.target.value)}
+                      />
+                      <p className={classes.bnTitle}>Enter Branch Name:</p>
+                      <input
+                        className={classes.inputText}
+                        type="text"
+                        onChange={(e) => setBankBranchName(e.target.value)}
+                      />
+                      <p className={classes.bnTitle}>Enter District:</p>
+                      <input
+                        className={classes.inputText}
+                        type="text"
+                        onChange={(e) => setBankAccDistrict(e.target.value)}
                       />
                     </div>
                   )}
@@ -258,28 +346,28 @@ const WithdrawPage = () => {
 
               <div className={classes.wdList}>
                 <p className={styles.graphTitle}>Withdraw Requests</p>
-                {WD_LIST_D.map((data, i) => (
-                  <div className={classes.listCardCon}>
+                {transactions.map((data, i) => (
+                  <div key={i} className={classes.listCardCon}>
                     <div className={classes.infoCon}>
                       <p className={classes.listText}>{data.date}</p>
                       <p className={classes.listText}>
                         Status:{" "}
-                        {data.status === "Pending" ? (
-                          <span className={classes.pending}>{data.status}</span>
+                        {data.status === 0 ? (
+                          <span className={classes.pending}>Pending</span>
                         ) : (
-                          <span className={classes.status}>{data.status}</span>
+                          <span className={classes.status}>Approved</span>
                         )}
                       </p>
                     </div>
 
                     <div className={classes.amountCon}>
-                      <p className={classes.listText}>${data.amount}</p>
+                      <p className={classes.listText}>${data.price}</p>
                     </div>
                   </div>
                 ))}
               </div>
 
-              <div className={classes.wdList}>
+              {/* <div className={classes.wdList}>
                 <p className={styles.graphTitle}>Content Sold</p>
                 {WD_LIST.map((data, i) => (
                   <div className={classes.listCardConCS}>
@@ -299,7 +387,7 @@ const WithdrawPage = () => {
                     </div>
                   </div>
                 ))}
-              </div>
+              </div> */}
             </div>
           </div>
         </div>
@@ -317,7 +405,7 @@ const WithdrawPage = () => {
             className={classes.inputText}
             type="number"
             onChange={(e) => {
-              setAmount(e.target.value);
+              setAmount(parseFloat(e.target.value));
             }}
           />
           {insuffErr && <p className={classes.error}>Insufficient balance!</p>}
@@ -329,6 +417,20 @@ const WithdrawPage = () => {
           </div>
         </Box>
       </Modal>
+
+      <Snackbar
+        open={success}
+        autoHideDuration={6000}
+        onClose={handleCloseSuccess}
+      >
+        <Alert
+          onClose={handleCloseSuccess}
+          severity="success"
+          sx={{ width: "100%" }}
+        >
+          {successMsg}
+        </Alert>
+      </Snackbar>
 
       {loading && (
         <Box

@@ -61,7 +61,6 @@ const DashboardPage = () => {
       },
     });
 
-
     if (!response.ok) {
       setLoading(false);
       return;
@@ -122,7 +121,7 @@ const DashboardPage = () => {
               <Link className={styles.link} to="/dashboard/withdraw">
                 <p className={styles.options}>Withdraw</p>
               </Link>
-               <Link className={styles.link} to="/dashboard/purchase">
+              <Link className={styles.link} to="/dashboard/purchase">
                 <p className={styles.options}>Purchase</p>
               </Link>
             </div>
@@ -154,7 +153,9 @@ const DashboardPage = () => {
                 />
               </div>
 
-              <div className={styles.graph}>
+              {/* GRAPH */}
+
+              {/* <div className={styles.graph}>
                 <p className={styles.graphTitle}>Income</p>
                 <ResponsiveContainer width="100%" height={300}>
                   <BarChart
@@ -166,7 +167,7 @@ const DashboardPage = () => {
                       bottom: 5,
                     }}
                   >
-                    <CartesianGrid strokeDasharray="3 3" />
+                    <CartesianGrid strokeDasharray="3 3" />//
                     <XAxis dataKey="name" />
                     <YAxis />
                     <Tooltip />
@@ -174,7 +175,7 @@ const DashboardPage = () => {
                     <Bar dataKey="value" fill="#6F6D6D" />
                   </BarChart>
                 </ResponsiveContainer>
-              </div>
+              </div> */}
             </div>
 
             {/* <div className={styles.customerLi}>
