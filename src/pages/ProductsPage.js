@@ -12,6 +12,8 @@ import styles from "./DashboardPage.module.css";
 import classes from "./ProductsPage.module.css";
 
 import { Editor } from "@tinymce/tinymce-react";
+import { CKEditor } from "@ckeditor/ckeditor5-react";
+import ClassicEditor from "@ckeditor/ckeditor5-build-classic";
 
 import MuiAlert from "@mui/material/Alert";
 import Snackbar from "@mui/material/Snackbar";
@@ -231,14 +233,15 @@ const ProductsPage = () => {
 
   const editorRef = useRef(null);
   const log = () => {
-    if (editorRef.current) {
-      setTextContent(editorRef.current.getContent());
+    console.log(editorRef.current.data.get());
+    if (editorRef.current.data) {
+      setTextContent(editorRef.current.data.get());
     }
     postDataHandler();
   };
   const updateLog = () => {
-    if (editorRef.current) {
-      setTextContent(editorRef.current.getContent());
+    if (editorRef.current.data) {
+      setTextContent(editorRef.current.data.get());
     }
     updateDataHandler();
   };
@@ -1012,25 +1015,11 @@ const ProductsPage = () => {
                     {addText && (
                       <div>
                         <p className={classes.formTitle}>Content</p>
-                        {/* <textarea className={classes.contentInput} /> */}
-                        <Editor
-                          onInit={(evt, editor) => (editorRef.current = editor)}
-                          initialValue=""
-                          init={{
-                            height: 500,
-                            menubar: false,
-                            plugins: [
-                              "advlist autolink lists link image charmap print preview anchor",
-                              "searchreplace visualblocks code fullscreen",
-                              "insertdatetime media table paste code help wordcount",
-                            ],
-                            toolbar:
-                              "undo redo | formatselect | " +
-                              "bold italic backcolor | alignleft aligncenter " +
-                              "alignright alignjustify | bullist numlist outdent indent | " +
-                              "removeformat | help",
-                            content_style:
-                              "body { font-family:Helvetica,Arial,sans-serif; font-size:14px }",
+                        <CKEditor
+                          editor={ClassicEditor}
+                          data=""
+                          onReady={(editor) => {
+                            editorRef.current = editor;
                           }}
                         />
                       </div>
