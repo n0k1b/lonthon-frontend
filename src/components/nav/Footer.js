@@ -6,13 +6,15 @@ import Box from "@mui/material/Box";
 import TextField from "@mui/material/TextField";
 import SendBtn from "../UI/SendBtn";
 import logo from "../../image/lonthon_logo.png";
+import banner from "../../image/payment.jpg";
 
 const Footer = () => {
   return (
     <>
       <div className={styles.content_world}>
-        <p className={styles.cw_text}>CONTENT WORLD</p>
-        <img className={styles.cw_logo} alt="logo" src={logo} />
+        {/* <p className={styles.cw_text}>CONTENT WORLD</p>
+        <img className={styles.cw_logo} alt="logo" src={logo} /> */}
+        <img className={styles.banner} src={banner} />
       </div>
 
       <div className={styles.container}>
@@ -62,7 +64,13 @@ const Footer = () => {
 
           <div>
             <p className={styles.title}>Contact</p>
-            <p className={styles.links}>Email</p>
+            <p className={styles.des}>
+              Address: 1509, Hazi Pada, Halishohor Road, South Agrabad,
+              Doublemooring, Chittagong
+              <br />
+              Phone Number: 01756330000
+            </p>
+            <p className={styles.links}>Email:</p>
             <div className={styles.emailInput}>
               <Box
                 component="form"

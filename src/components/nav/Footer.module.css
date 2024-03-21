@@ -76,7 +76,11 @@
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 99px;
+  height: fit-content;
+}
+
+.banner {
+  width: 90vw;
 }
 
 .cw_text {
