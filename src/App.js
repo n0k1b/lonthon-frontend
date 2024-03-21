@@ -22,6 +22,9 @@ import Signup from "./pages/Signup";
 import WithdrawPage from "./pages/WithdrawPage";
 import ProductsPage from "./pages/ProductsPage";
 import PurchasePage from "./pages/PurchasePage";
+import TnCPage from "./pages/TnCPage";
+import RnRPage from "./pages/RnRPage";
+import PrivacyPolicyPage from "./pages/PrivacyPolicyPage";
 
 function App() {
   const dispatch = useDispatch();
@@ -76,6 +79,9 @@ function App() {
       { label: "OTHERS", id: null, url: "others" },
       { label: "PROMOTIONS", id: null, url: "promotions" },
       { label: "DASHBOARD", id: null, url: "dashboard" },
+      { label: "Terms & Condition", id: null, url: "terms_condition" },
+      { label: "Return and Refund Policy", id: null, url: "return_refund" },
+      { label: "Privacy Policy", id: null, url: "privacy_policy" },
     ];
 
     setNavbarMenu(NavbarMenuItems);
@@ -137,6 +143,12 @@ function App() {
                   path="/contents/:cat/:subCat"
                   element={<LiteraturePage />}
                 />
+
+                <Route path="terms_condition" element={<TnCPage />} />
+
+                <Route path="return_refund" element={<RnRPage />} />
+
+                <Route path="privacy_policy" element={<PrivacyPolicyPage />} />
               </Routes>
             </ScrollToTop>
 
