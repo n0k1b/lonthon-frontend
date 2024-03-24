@@ -7,6 +7,7 @@ import TextField from "@mui/material/TextField";
 import SendBtn from "../UI/SendBtn";
 import logo from "../../image/lonthon_logo.png";
 import banner from "../../image/payment.jpg";
+import { Link } from "react-router-dom";
 
 const Footer = () => {
   return (
@@ -57,8 +58,12 @@ const Footer = () => {
 
           <div className={styles.titleLinkContainer}>
             <p className={styles.title}>Legal</p>
-            <p className={styles.links}>Terms & Conditions</p>
-            <p className={styles.links}>Privacy Policy</p>
+            <Link className={styles.links} to="/terms_condition">
+              <p>Terms & Conditions</p>
+            </Link>
+            <Link className={styles.links} to="/privacy_policy">
+              <p>Privacy Policy</p>
+            </Link>
             <p className={styles.links}>Copyrignt Information</p>
           </div>
 
