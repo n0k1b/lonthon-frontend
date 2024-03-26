@@ -76,9 +76,11 @@ const Footer = () => {
               Doublemooring, Chittagong
               <br />
               Phone Number: 01756330000
+              <br />
+              Email: nevrith123chack@gmail.com
             </p>
             <p className={styles.links}>Email:</p>
-            <div className={styles.emailInput}>
+            {/* <div className={styles.emailInput}>
               <Box
                 component="form"
                 sx={{
@@ -94,7 +96,7 @@ const Footer = () => {
                 <TextField id="outlined-basic" label="" variant="outlined" />
                 <SendBtn />
               </Box>
-            </div>
+            </div> */}
           </div>
         </div>
       </div>

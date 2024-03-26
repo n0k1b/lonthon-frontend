@@ -58,7 +58,7 @@ const TnCPage = () => {
         other users can download it for a fee or free of charge.
         <br />
         3. In case of any disagreement, objection, or question, please contact
-        us at [contact email/phone number].
+        us at 01756330000.
         <br />
         <br />
         <strong>Section 2: User Responsibilities</strong>

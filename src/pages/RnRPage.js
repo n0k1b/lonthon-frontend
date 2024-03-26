@@ -53,7 +53,7 @@ const RnRPage = () => {
           <br />
           <br />
           আমাদের ফেরত এবং ফেরতের নীতি সম্পর্কে যদি কোনও প্রশ্ন বা সন্দেহ থাকে,
-          অনুগ্রহ করে আমাদের সাথে যোগাযোগ করুন [যোগাযোগের ইমেল / ফোন নম্বর] এর
+          অনুগ্রহ করে আমাদের সাথে যোগাযোগ করুন ০১৭৫৬৩৩০০০০ এর
           জন্য সহায়তা নিতে।
           <br />
           <br />
@@ -112,7 +112,7 @@ const RnRPage = () => {
           <strong>Contact Us</strong>
           <br />
           If you have any questions or concerns about our Return and Refund
-          Policy, please contact us at [contact email/phone number] for
+          Policy, please contact us at 01756330000 for
           assistance.
           <br />
           <br />

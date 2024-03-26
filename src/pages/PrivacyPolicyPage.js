@@ -37,7 +37,7 @@ const PrivacyPolicyPage = () => {
           যোগাযোগ
           <br />
           যদি আপনার যেকোনো প্রশ্ন বা সন্দেহ থাকে আমাদের গোপনীয়তা নীতি সম্পর্কে,
-          অনুগ্রহ করে [যোগাযোগের ইমেল / ফোন নম্বর] সাথে যোগাযোগ করুন করুন।
+          অনুগ্রহ করে ০১৭৫৬৩৩০০০০ সাথে যোগাযোগ করুন করুন।
           <br />
           <br />
           <br />
@@ -74,7 +74,7 @@ const PrivacyPolicyPage = () => {
           <strong>Contact</strong>
           <br />
           If you have any questions or concerns about our privacy policy, please
-          contact us at [contact email/phone number].
+          contact us at 01756330000.
           <br />
           <br />
           Please note that by using our website, you agree to the terms of our
